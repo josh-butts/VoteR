@@ -27,7 +27,7 @@ long long binarySearch(const T& item, const TemplatedArray<T>& array, const Comp
 		else // it's found
 		{
 			// find the first instance of the found object
-			while (comparator.compare(array[mid], array[mid - 1]) == 0 && mid != 0) // if it's the same as the one before it
+			while (mid != 0 && comparator.compare(array[mid], array[mid - 1]) == 0) // if it's the same as the one before it
 			{
 				mid = mid - 1; // move the index back one
 			}
