@@ -9,8 +9,8 @@ template <typename T>
 class Sorter {
 private:
 	// Both private methods are adapted from ZyBooks
-	static void mergeSort(TemplatedArray<T>& array, Comparator<T>& comparator, unsigned long i, unsigned long k);
-	static void merge(TemplatedArray<T>& array, Comparator<T>& comparator, unsigned long i, unsigned long j, unsigned long k);
+	static void mergeSort(TemplatedArray<T>& array, const Comparator<T>& comparator, unsigned long i, unsigned long k);
+	static void merge(TemplatedArray<T>& array, const Comparator<T>& comparator, unsigned long i, unsigned long j, unsigned long k);
 public:
 	static void sort(TemplatedArray<T>& array, const Comparator<T>& comparator);
 };
@@ -24,7 +24,7 @@ void Sorter<T>::sort(TemplatedArray<T>& array, const Comparator<T>& comparator)
 
 // Recursively defined merge sort algorithm
 template<typename T>
-void Sorter<T>::mergeSort(TemplatedArray<T>& array, Comparator<T>& comparator, unsigned long i, unsigned long k)
+void Sorter<T>::mergeSort(TemplatedArray<T>& array, const Comparator<T>& comparator, unsigned long i, unsigned long k)
 {
 	unsigned long j = 0;
 	if (i < k)
@@ -43,7 +43,7 @@ void Sorter<T>::mergeSort(TemplatedArray<T>& array, Comparator<T>& comparator, u
 
 // Used only by mergeSort, the function merges two arrays and copies back the merged array to the original
 template<typename T>
-void Sorter<T>::merge(TemplatedArray<T>& array, Comparator<T>& comparator, unsigned long i, unsigned long j, unsigned long k)
+void Sorter<T>::merge(TemplatedArray<T>& array, const Comparator<T>& comparator, unsigned long i, unsigned long j, unsigned long k)
 {
 	unsigned long mergedSize = k - i + 1;								// Size of merged partition
 	unsigned long mergePos = 0;											// Position to insert merged number
