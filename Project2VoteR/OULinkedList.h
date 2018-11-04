@@ -10,7 +10,7 @@
 // items (that is, duplicates are not allowed)
 template <typename T>
 class OULinkedList {
-	template <typename T>
+	template <typename U> //CHANGING T TO U SUPRESSES AN ERROR IN ZYLABS
 	friend class OULinkedListEnumerator;
 private:
 	Comparator<T>* comparator = NULL;				// used to determine list order and item equality

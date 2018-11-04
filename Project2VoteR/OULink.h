@@ -3,9 +3,9 @@
 
 template <typename T>
 class OULink {
-	template <typename T>
+	template <typename U> //CHANGING T TO U SUPRESSES AN ERROR IN ZYLABS
 	friend class OULinkedList;
-	template <typename T>
+	template <typename U> //CHANGING T TO U SUPRESSES AN ERROR IN ZYLABS
 	friend class OULinkedListEnumerator;
 private:
 	T* data = NULL;										// pointer to data item of any type
