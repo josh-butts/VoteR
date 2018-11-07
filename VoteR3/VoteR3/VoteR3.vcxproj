@@ -151,7 +151,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="NvraComparator.cpp" />
+    <ClCompile Include="NvraRecord.cpp" />
     <ClCompile Include="VoteR3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Comparator.h" />
+    <ClInclude Include="Enumerator.h" />
+    <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="NvraComparator.h" />
+    <ClInclude Include="NvraRecord.h" />
+    <ClInclude Include="OULink.h" />
+    <ClInclude Include="OULinkedList.h" />
+    <ClInclude Include="OULinkedListEnumerator.h" />
+    <ClInclude Include="Search.h" />
+    <ClInclude Include="Sorter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
