@@ -159,7 +159,11 @@
     <ClInclude Include="Comparator.h" />
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="Hasher.h" />
+    <ClInclude Include="HashTable.h" />
+    <ClInclude Include="HashTableEnumerator.h" />
     <ClInclude Include="NvraComparator.h" />
+    <ClInclude Include="NvraHasher.h" />
     <ClInclude Include="NvraRecord.h" />
     <ClInclude Include="OULink.h" />
     <ClInclude Include="OULinkedList.h" />
