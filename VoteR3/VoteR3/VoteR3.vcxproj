@@ -156,6 +156,7 @@
     <ClCompile Include="VoteR3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Project2VoteR\TemplatedArray.h" />
     <ClInclude Include="Comparator.h" />
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="Exceptions.h" />
