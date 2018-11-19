@@ -11,6 +11,7 @@ private:
 	OULink<T>* current;
 public:
 	OULinkedListEnumerator(OULink<T>* first);
+	virtual ~OULinkedListEnumerator();
 	bool hasNext() const;
 	T next();
 	T peek() const;
@@ -21,6 +22,12 @@ template <typename T>
 OULinkedListEnumerator<T>::OULinkedListEnumerator(OULink<T>* first)
 {
 	current = first;
+}
+
+template <typename T>
+OULinkedListEnumerator<T>::~OULinkedListEnumerator()
+{
+
 }
 
 template <typename T>
