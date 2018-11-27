@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="NvraComparator.cpp" />
+    <ClCompile Include="NvraHasher.cpp" />
     <ClCompile Include="NvraRecord.cpp" />
     <ClCompile Include="VoteR3.cpp" />
   </ItemGroup>

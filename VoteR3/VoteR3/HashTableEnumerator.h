@@ -22,5 +22,19 @@ public:
 };
 
 // put implementation for HashTableEnumerator here
+template <typename T>
+HashTableEnumerator<T>::HashTableEnumerator(HashTable<T>* hashTable)
+{
+	this->hashTable = hashTable;
+}
+
+template <typename T>
+HashTableEnumerator<T>::~HashTableEnumerator() {}
+
+template <typename T>
+bool HashTableEnumerator<T>::hasNext() const
+{
+
+}
 
 #endif // !HASH_TABLE_ENUMERATOR

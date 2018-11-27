@@ -25,10 +25,7 @@ OULinkedListEnumerator<T>::OULinkedListEnumerator(OULink<T>* first)
 }
 
 template <typename T>
-OULinkedListEnumerator<T>::~OULinkedListEnumerator()
-{
-
-}
+OULinkedListEnumerator<T>::~OULinkedListEnumerator() {}
 
 template <typename T>
 bool OULinkedListEnumerator<T>::hasNext() const

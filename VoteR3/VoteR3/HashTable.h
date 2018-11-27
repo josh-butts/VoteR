@@ -64,5 +64,77 @@ public:
 };
 
 // put implementation for HashTable here
+template <typename T>
+HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher)
+{
+	this->comparator = comparator;
+	this->hasher = hasher;
+}
+
+template <typename T>
+HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher, unsigned long size = DEFAULT_TABLE_SIZE,
+	float maxLoadFactor = DEFAULT_MAX_LOAD_FACTOR,
+	float minLoadFactor = DEFAULT_MIN_LOAD_FACTOR)
+{
+	this->comparator = comparator;
+	this->hasher = hasher;
+}
+
+template <typename T>
+HashTable<T>::~HashTable() {}
+
+template <typename T>
+bool HashTable<T>::insert(T* item)
+{
+
+}
+
+template <typename T>
+bool HashTable<T>::replace(T* item)
+{
+
+}
+
+template <typename T>
+bool HashTable<T>::remove(T* item)
+{
+
+}
+
+template <typename T>
+T HashTable<T>::find(const T* item) const
+{
+
+}
+
+template <typename T>
+unsigned long HashTable<T>::getSize() const
+{
+	return size;
+}
+
+template <typename T>
+unsigned long HashTable<T>::getBaseCapacity() const
+{
+	return baseCapacity;
+}
+
+template <typename T>
+unsigned long HashTable<T>::getTotalCapacity() const
+{
+	return totalCapacity;
+}
+
+template <typename T>
+float HashTable<T>::getLoadFactor() const
+{
+
+}
+
+template <typename T>
+unsigned long HashTable<T>::getBucketNumber(const T* item) const
+{
+
+}
 
 #endif // !HASH_TABLE
