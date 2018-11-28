@@ -30,6 +30,7 @@ HashTableEnumerator<T>::HashTableEnumerator(HashTable<T>* hashTable)
 		throw new ExceptionHashTableAccess();
 	}
 	this->hashTable = hashTable;
+	chainEnumerator = &hashTable->table[bucket]->enumerator();
 }
 
 template <typename T>
@@ -38,7 +39,7 @@ HashTableEnumerator<T>::~HashTableEnumerator() {}
 template <typename T>
 bool HashTableEnumerator<T>::hasNext() const
 {
-
+	
 }
 
 template <typename T>

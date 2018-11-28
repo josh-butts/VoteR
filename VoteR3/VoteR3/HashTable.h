@@ -71,6 +71,28 @@ public:
 
 };
 
+//private methods:
+template <typename T>
+OULinkedList<T>** HashTable<T>::initializeTable(unsigned long capacity, Comparator<T>* comparator)
+{
+	table = new OULinkedList<T>*[capacity]; //array of pointers to linked lists
+	for (unsigned int i = 0; i < capacity; ++i) //loop through the table and initialize the linked lists
+	{
+		table[i] = new OULinkedList<T>(comparator);
+	}
+	return table;
+}
+
+template <typename T>
+void HashTable<T>::deleteTable()
+{
+	for (unsigned int i = 0; i < baseCapacity; ++i) //loop through the table and delete the linked lists
+	{
+		delete table[i];
+	}
+	delete table;
+}
+
 // put implementation for HashTable here
 template <typename T>
 HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher)
@@ -95,18 +117,7 @@ HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher, unsigned l
 template <typename T>
 HashTable<T>::~HashTable() 
 {
-
-}
-
-template <typename T>
-OULinkedList<T>** HashTable<T>::initializeTable(unsigned long capacity, Comparator<T>* comparator)
-{
-	table = new OULinkedList<T>*[capacity]; //array of pointers to linked lists
-	for (unsigned int i = 0; i < capacity; ++i) //loop through the table and initialize the linked lists
-	{
-		table[i] = new OULinkedList<T>(comparator);
-	}
-	return table;
+	deleteTable();
 }
 
 template <typename T>
@@ -161,12 +172,13 @@ template <typename T>
 T HashTable<T>::find(const T* item) const
 {
 	unsigned long bucketIndex = getBucketNumber(item); //get bucket number for the item
-	for (unsigned int i = 0; i < table[bucketIndex]->getSize(); ++i)
+	try
 	{
-		if (comparator->compare(item, table[bucketIndex]->get()) == 0)
-		{
-
-		}
+		return table[bucketIndex]->find(item);
+	}
+	catch(ExceptionLinkedListAccess()) //failure to find
+	{
+		throw new ExceptionHashTableAccess();
 	}
 }
 
@@ -191,7 +203,8 @@ unsigned long HashTable<T>::getTotalCapacity() const
 template <typename T>
 float HashTable<T>::getLoadFactor() const
 {
-
+	float loadFactor = ((float)size) / ((float)totalCapacity);
+	return loadFactor;
 }
 
 template <typename T>
