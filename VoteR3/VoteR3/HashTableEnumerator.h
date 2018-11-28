@@ -25,6 +25,10 @@ public:
 template <typename T>
 HashTableEnumerator<T>::HashTableEnumerator(HashTable<T>* hashTable)
 {
+	if (hashTable->getSize() < 0)
+	{
+		throw new ExceptionHashTableAccess();
+	}
 	this->hashTable = hashTable;
 }
 
@@ -33,6 +37,18 @@ HashTableEnumerator<T>::~HashTableEnumerator() {}
 
 template <typename T>
 bool HashTableEnumerator<T>::hasNext() const
+{
+
+}
+
+template <typename T>
+T HashTableEnumerator<T>::next()
+{
+
+}
+
+template <typename T>
+T HashTableEnumerator<T>::peek() const
 {
 
 }

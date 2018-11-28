@@ -7,6 +7,8 @@
 #include "OULinkedListEnumerator.h"
 #include "Hasher.h"
 
+#include "NvraRecord.h"
+
 const unsigned int SCHEDULE_SIZE = 25;			// the number of items in the size schedule
 const unsigned int SCHEDULE[SCHEDULE_SIZE] = { 1, 2, 5, 11, 23, 53, 107, 223, 449, 907, 1823, 3659, 7309, 14621, 29243, 58511, 117023, 234067, 468157, 936319, 1872667, 3745283, 7490573, 14981147, 29962343 };		// the size schedule (all primes)
 const unsigned int DEFAULT_SCHEDULE_INDEX = 3;	// the default position in the size schedule
@@ -30,6 +32,12 @@ private:
 	unsigned long totalCapacity = baseCapacity;				// the size of the array plus chains of more than one link
 	OULinkedList<T>** table = NULL;							// table will be an array of pointers to OULinkedLists of type T
 	// you may add additional member variables and functions here to support the operation of your code
+	// From Dr. Hougen's lecture:
+	OULinkedList<T>** initializeTable(unsigned long capacity, Comparator<T>* comparator);
+	void copyTable(OULinkedList<T>** newTable);
+	void deleteTable();
+	void expandTable();
+	void contractTable();
 public:
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher);			// creates an empty table of DEFAULT_BASE_CAPACITY
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher,
@@ -69,24 +77,54 @@ HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher)
 {
 	this->comparator = comparator;
 	this->hasher = hasher;
+	table = initializeTable(baseCapacity, comparator);
 }
 
 template <typename T>
-HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher, unsigned long size = DEFAULT_TABLE_SIZE,
-	float maxLoadFactor = DEFAULT_MAX_LOAD_FACTOR,
-	float minLoadFactor = DEFAULT_MIN_LOAD_FACTOR)
+HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher, unsigned long size,
+	float maxLoadFactor, float minLoadFactor)
 {
 	this->comparator = comparator;
 	this->hasher = hasher;
+	this->size = size;
+	this->maxLoadFactor = maxLoadFactor;
+	this->minLoadFactor = minLoadFactor;
+	table = initializeTable(baseCapacity, comparator);
 }
 
 template <typename T>
-HashTable<T>::~HashTable() {}
+HashTable<T>::~HashTable() 
+{
+
+}
+
+template <typename T>
+OULinkedList<T>** HashTable<T>::initializeTable(unsigned long capacity, Comparator<T>* comparator)
+{
+	table = new OULinkedList<T>*[capacity]; //array of pointers to linked lists
+	for (unsigned int i = 0; i < capacity; ++i) //loop through the table and initialize the linked lists
+	{
+		table[i] = new OULinkedList<T>(comparator);
+	}
+	return table;
+}
 
 template <typename T>
 bool HashTable<T>::insert(T* item)
 {
-
+	unsigned long bucketIndex = getBucketNumber(item); //get bucket number for the item
+	if (table[bucketIndex]->insert(item)) //attempt to insert
+	{
+		//success
+		++size; //increment size
+		if (table[bucketIndex]->getSize() >= 2)
+		{
+			++totalCapacity; //increment capacity if overflowing
+		}
+		//TODO: resizeTable();
+		return true;
+	}
+	return false; //failure, item alread exists in the bucket
 }
 
 template <typename T>
