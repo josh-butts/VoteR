@@ -39,43 +39,28 @@ HashTableEnumerator<T>::~HashTableEnumerator() {}
 template <typename T>
 bool HashTableEnumerator<T>::hasNext() const
 {
-	for (unsigned long i = bucket; i < hashTable->getBaseCapacity; ++i) //iterating through the buckets
-	{
-		OULinkedListEnumerator<T>* newChainEnumerator = &hashTable->table[i]->enumerator();
-		if (newChainEnumerator->hasNext())
-		{
-			return true;
-		}
-	}
-	return false;
+	return chainEnumerator->hasNext();
 }
 
 template <typename T>
 T HashTableEnumerator<T>::next()
 {
-	for (unsigned long i = bucket; i < hashTable->getBaseCapacity; ++i)
+	while (!chainEnumerator->hasNext()) //while at the end of a list/in an empty list
 	{
-		chainEnumerator = &hashTable->table[i]->enumerator();
-		if (chainEnumerator->hasNext())
+		++bucket; //move to the next bucket
+		if (bucket >= hashTable->baseCapacity) //throw exception if end of table is reached
 		{
-			return chainEnumerator->next();
+			throw new ExceptionEnumerationBeyondEnd();
 		}
+		chainEnumerator = &hashTable->table[bucket]->enumerator(); //update the enumerator to the next bucket
 	}
-	throw new ExceptionEnumerationBeyondEnd();
+	return chainEnumerator->next(); //return item and move to next
 }
 
 template <typename T>
 T HashTableEnumerator<T>::peek() const
 {
-	for (unsigned long i = bucket; i < hashTable->getBaseCapacity; ++i)
-	{
-		OULinkedListEnumerator<T>* newChainEnumerator = &hashTable->table[i]->enumerator();
-		if (newChainEnumerator->hasNext())
-		{
-			return newChainEnumerator->peek();
-		}
-	}
-	throw new ExceptionEnumerationBeyondEnd();
+	return chainEnumerator->peek();
 }
 
 #endif // !HASH_TABLE_ENUMERATOR
