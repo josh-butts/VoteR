@@ -93,7 +93,7 @@ void HashTable<T>::deleteTable()
 	delete table;
 }
 
-// put implementation for HashTable here
+//public methods:
 template <typename T>
 HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher)
 {
@@ -203,14 +203,13 @@ unsigned long HashTable<T>::getTotalCapacity() const
 template <typename T>
 float HashTable<T>::getLoadFactor() const
 {
-	float loadFactor = ((float)size) / ((float)totalCapacity);
-	return loadFactor;
+	return ((float)size) / ((float)totalCapacity);
 }
 
 template <typename T>
 unsigned long HashTable<T>::getBucketNumber(const T* item) const
 {
-
+	return hasher->hash(*item) / baseCapacity;
 }
 
 #endif // !HASH_TABLE
