@@ -117,7 +117,7 @@ bool HashTable<T>::insert(T* item)
 	{
 		//success
 		++size; //increment size
-		if (table[bucketIndex]->getSize() >= 2)
+		if (table[bucketIndex]->getSize() > 1)
 		{
 			++totalCapacity; //increment capacity if overflowing
 		}
@@ -130,19 +130,44 @@ bool HashTable<T>::insert(T* item)
 template <typename T>
 bool HashTable<T>::replace(T* item)
 {
-
+	unsigned long bucketIndex = getBucketNumber(item); //get bucket number for the item
+	if (table[bucketIndex]->replace(item))
+	{
+		return true; //success
+	}
+	return false; //failure
 }
 
 template <typename T>
 bool HashTable<T>::remove(T* item)
 {
-
+	unsigned long bucketIndex = getBucketNumber(item); //get bucket number for the item
+	unsigned long chainSize = table[bucketIndex]->getSize();
+	if (table[bucketIndex]->remove(item))
+	{
+		//success
+		--size; //decrement size
+		if (chainSize > 1)
+		{
+			--totalCapacity;
+		}
+		//TODO: resizeTable();
+		return true;
+	}
+	return false;
 }
 
 template <typename T>
 T HashTable<T>::find(const T* item) const
 {
+	unsigned long bucketIndex = getBucketNumber(item); //get bucket number for the item
+	for (unsigned int i = 0; i < table[bucketIndex]->getSize(); ++i)
+	{
+		if (comparator->compare(item, table[bucketIndex]->get()) == 0)
+		{
 
+		}
+	}
 }
 
 template <typename T>
