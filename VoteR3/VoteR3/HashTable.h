@@ -15,7 +15,6 @@ const unsigned int DEFAULT_SCHEDULE_INDEX = 3;	// the default position in the si
 const unsigned long DEFAULT_BASE_CAPACITY = SCHEDULE[DEFAULT_SCHEDULE_INDEX]; 	// the default size of the array
 const float DEFAULT_MAX_LOAD_FACTOR = 0.9f;		// the default load factor used to determine when to increase the table size
 const float DEFAULT_MIN_LOAD_FACTOR = 0.4f;		// the default load factor used to determine when to decrease the table size
-const unsigned long DEFAULT_TABLE_SIZE = floor(DEFAULT_BASE_CAPACITY*DEFAULT_MAX_LOAD_FACTOR);
 
 template <typename T>
 class HashTable {
@@ -34,7 +33,6 @@ private:
 	// you may add additional member variables and functions here to support the operation of your code
 	// From Dr. Hougen's lecture:
 	OULinkedList<T>** initializeTable(unsigned long capacity, Comparator<T>* comparator);
-	void copyTable(OULinkedList<T>** newTable);
 	void deleteTable();
 	void expandTable();
 	void contractTable();
@@ -42,7 +40,7 @@ public:
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher);			// creates an empty table of DEFAULT_BASE_CAPACITY
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher,
 		// if size given, creates empty table with size from schedule of sufficient capacity (considering maxLoadFactor)
-		unsigned long size = DEFAULT_TABLE_SIZE,
+		unsigned long size,
 		float maxLoadFactor = DEFAULT_MAX_LOAD_FACTOR,
 		float minLoadFactor = DEFAULT_MIN_LOAD_FACTOR);
 	virtual ~HashTable();
@@ -108,10 +106,10 @@ HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher, unsigned l
 {
 	this->comparator = comparator;
 	this->hasher = hasher;
-	this->size = size;
 	this->maxLoadFactor = maxLoadFactor;
 	this->minLoadFactor = minLoadFactor;
 	table = initializeTable(baseCapacity, comparator);
+	//TODO: make the table base capacity adequate for no resizing
 }
 
 template <typename T>

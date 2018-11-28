@@ -13,6 +13,7 @@ private:
 	OULinkedListEnumerator<T>* chainEnumerator = NULL;		// used to move through the linked list of the current bucket
 	HashTable<T>* hashTable = NULL;							// pointer to the HashTable being enumerated
 	// you may add additional member variables and functions here to support the operation of your code
+	void findNextBucket();
 public:
 	HashTableEnumerator(HashTable<T>* hashTable);			// constructor needs a pointer to the HashTable to be enumerated
 	virtual ~HashTableEnumerator();
@@ -22,6 +23,9 @@ public:
 };
 
 // put implementation for HashTableEnumerator here
+//template <typename>
+
+
 template <typename T>
 HashTableEnumerator<T>::HashTableEnumerator(HashTable<T>* hashTable)
 {
@@ -45,6 +49,11 @@ bool HashTableEnumerator<T>::hasNext() const
 template <typename T>
 T HashTableEnumerator<T>::next()
 {
+	T temp;
+	if (chainEnumerator->hasNext())
+	{
+		temp = chainEnumerator->next();
+	}
 	while (!chainEnumerator->hasNext()) //while at the end of a list/in an empty list
 	{
 		++bucket; //move to the next bucket
@@ -52,9 +61,10 @@ T HashTableEnumerator<T>::next()
 		{
 			throw new ExceptionEnumerationBeyondEnd();
 		}
-		chainEnumerator = &hashTable->table[bucket]->enumerator(); //update the enumerator to the next bucket
+		chainEnumerator = new OULinkedListEnumerator<T>(hashTable->table[bucket]->enumerator()); //update the enumerator to the next bucket
 	}
-	return chainEnumerator->next(); //return item and move to next
+
+	return temp; //return item and move to next
 }
 
 template <typename T>
