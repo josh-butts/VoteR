@@ -100,7 +100,7 @@ void HashTable<T>::copyTable(OULinkedList<T>** newTable)
 		delete chainEnumerator;
 	}
 	table = newTable;
-	newTable = NULL;
+	//newTable = NULL;
 }
 
 template <typename T>
@@ -254,7 +254,9 @@ void HashTable<T>::printTable()
 {
 	for (unsigned long i = 0; i < baseCapacity; ++i)
 	{
-		std::cout << getBucketNumber(new T(table[i]->get())) << ": ";
+		int bucketNum;
+		bucketNum = getBucketNumber(new T(table[i]->get()));
+		std::cout << bucketNum << ": ";
 		OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
 		std::cout << chainEnumerator->next();
 		while (chainEnumerator->hasNext())
