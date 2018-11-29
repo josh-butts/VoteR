@@ -40,7 +40,7 @@ void HashTableEnumerator<T>::findNextItem()
 template <typename T>
 HashTableEnumerator<T>::HashTableEnumerator(HashTable<T>* hashTable)
 {
-	if (hashTable->getSize() < 0)
+	if (hashTable->getSize() <= 0)
 	{
 		throw new ExceptionHashTableAccess();
 	}

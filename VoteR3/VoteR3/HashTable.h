@@ -33,8 +33,6 @@ private:
 	// The following method headers are from Dr. Hougen's lecture:
 	OULinkedList<T>** initializeTable(unsigned long capacity, Comparator<T>* comparator);
 	void deleteTable();
-	void expandTable();
-	void contractTable();
 	void resizeTable();
 public:
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher);			// creates an empty table of DEFAULT_BASE_CAPACITY
@@ -86,20 +84,6 @@ void HashTable<T>::deleteTable()
 }
 
 template <typename T>
-void HashTable<T>::expandTable()
-{
-	++scheduleIndex;
-	table = initializeTable(SCHEDULE[scheduleIndex], comparator);
-}
-
-template <typename T>
-void HashTable<T>::contractTable()
-{
-	--scheduleIndex;
-	table = initializeTable(SCHEDULE[scheduleIndex], comparator);
-}
-
-template <typename T>
 void HashTable<T>::resizeTable()
 {
 	if (getLoadFactor() >= maxLoadFactor)
@@ -107,16 +91,36 @@ void HashTable<T>::resizeTable()
 		++scheduleIndex;
 		baseCapacity = SCHEDULE[scheduleIndex];
 		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
+		for (unsigned int i; i < baseCapacity; ++i)
+		{
+			OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
+			while (chainEnumerator->hasNext())
+			{
+				unsigned long bucketNum = getBucketNumber(new T(chainEnumerator->peek()));
+				newTable[bucketNum]->insert(new T(chainEnumerator->next()));
+			}
+			delete chainEnumerator;
+		}
 		table = newTable;
-		delete newTable;
+		newTable = NULL;
 	}
 	else if (getLoadFactor() <= minLoadFactor)
 	{
 		--scheduleIndex;
 		baseCapacity = SCHEDULE[scheduleIndex];
 		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
+		for (unsigned int i; i < baseCapacity; ++i)
+		{
+			OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
+			while (chainEnumerator->hasNext())
+			{
+				unsigned long bucketNum = getBucketNumber(new T(chainEnumerator->peek()));
+				newTable[bucketNum]->insert(new T(chainEnumerator->next()));
+			}
+			delete chainEnumerator;
+		}
 		table = newTable;
-		delete newTable;
+		newTable = NULL;
 	}
 }
 
@@ -138,7 +142,7 @@ HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher, unsigned l
 	this->maxLoadFactor = maxLoadFactor;
 	this->minLoadFactor = minLoadFactor;
 	unsigned int tempCapacity = (((int)(((float)size) / maxLoadFactor)) + 1); // this line is from the groupme, i know it looks terrible
-	for (int i = SCHEDULE_SIZE; i >= 0; --i)
+	for (int i = SCHEDULE_SIZE; i >= 0; --i) // loop finds the base capacity
 	{
 		if (tempCapacity <= SCHEDULE[i])
 		{
