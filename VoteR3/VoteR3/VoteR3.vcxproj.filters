@@ -75,4 +75,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="partial1.csv">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="partial4.csv">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="partial4_duplicates.csv">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="x.csv">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

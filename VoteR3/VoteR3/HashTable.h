@@ -33,6 +33,7 @@ private:
 	// The following method headers are from Dr. Hougen's lecture:
 	OULinkedList<T>** initializeTable(unsigned long capacity, Comparator<T>* comparator);
 	void deleteTable();
+	void copyTable(OULinkedList<T>** newTable);
 	void resizeTable();
 public:
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher);			// creates an empty table of DEFAULT_BASE_CAPACITY
@@ -59,6 +60,8 @@ public:
 	unsigned long getTotalCapacity() const;				// returns the current total capacity of the table
 	float getLoadFactor() const;						// returns the current load factor of the table
 	unsigned long getBucketNumber(const T* item) const;	// returns the bucket number for an item using its hash function mod array size
+
+	void printTable(); //prints the contents of the hash table
 };
 
 //private methods:
@@ -84,6 +87,23 @@ void HashTable<T>::deleteTable()
 }
 
 template <typename T>
+void HashTable<T>::copyTable(OULinkedList<T>** newTable)
+{
+	for (unsigned int i = 0; i < baseCapacity; ++i)
+	{
+		OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
+		while (chainEnumerator->hasNext())
+		{
+			unsigned long bucketNum = getBucketNumber(new T(chainEnumerator->peek()));
+			newTable[bucketNum]->insert(new T(chainEnumerator->next()));
+		}
+		delete chainEnumerator;
+	}
+	table = newTable;
+	newTable = NULL;
+}
+
+template <typename T>
 void HashTable<T>::resizeTable()
 {
 	if (getLoadFactor() >= maxLoadFactor)
@@ -91,36 +111,14 @@ void HashTable<T>::resizeTable()
 		++scheduleIndex;
 		baseCapacity = SCHEDULE[scheduleIndex];
 		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
-		for (unsigned int i; i < baseCapacity; ++i)
-		{
-			OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
-			while (chainEnumerator->hasNext())
-			{
-				unsigned long bucketNum = getBucketNumber(new T(chainEnumerator->peek()));
-				newTable[bucketNum]->insert(new T(chainEnumerator->next()));
-			}
-			delete chainEnumerator;
-		}
-		table = newTable;
-		newTable = NULL;
+		copyTable(newTable);
 	}
 	else if (getLoadFactor() <= minLoadFactor)
 	{
 		--scheduleIndex;
 		baseCapacity = SCHEDULE[scheduleIndex];
 		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
-		for (unsigned int i; i < baseCapacity; ++i)
-		{
-			OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
-			while (chainEnumerator->hasNext())
-			{
-				unsigned long bucketNum = getBucketNumber(new T(chainEnumerator->peek()));
-				newTable[bucketNum]->insert(new T(chainEnumerator->next()));
-			}
-			delete chainEnumerator;
-		}
-		table = newTable;
-		newTable = NULL;
+		copyTable(newTable);
 	}
 }
 
@@ -249,6 +247,22 @@ template <typename T>
 unsigned long HashTable<T>::getBucketNumber(const T* item) const
 {
 	return hasher->hash(*item) % baseCapacity;
+}
+
+template <typename T>
+void HashTable<T>::printTable()
+{
+	for (unsigned long i = 0; i < baseCapacity; ++i)
+	{
+		std::cout << getBucketNumber(new T(table[i]->get())) << ": ";
+		OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
+		std::cout << chainEnumerator->next();
+		while (chainEnumerator->hasNext())
+		{
+			std::cout << "OVERFLOW: " << chainEnumerator->next() << "\n";
+		}
+		std::cout << "\n\n";
+	}
 }
 
 #endif // !HASH_TABLE
