@@ -6,7 +6,6 @@
 #include "OULinkedList.h"
 #include "OULinkedListEnumerator.h"
 #include "Hasher.h"
-
 #include "NvraRecord.h"
 
 const unsigned int SCHEDULE_SIZE = 25;			// the number of items in the size schedule
@@ -31,11 +30,12 @@ private:
 	unsigned long totalCapacity = baseCapacity;				// the size of the array plus chains of more than one link
 	OULinkedList<T>** table = NULL;							// table will be an array of pointers to OULinkedLists of type T
 	// you may add additional member variables and functions here to support the operation of your code
-	// From Dr. Hougen's lecture:
+	// The following method headers are from Dr. Hougen's lecture:
 	OULinkedList<T>** initializeTable(unsigned long capacity, Comparator<T>* comparator);
 	void deleteTable();
 	void expandTable();
 	void contractTable();
+	void resizeTable();
 public:
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher);			// creates an empty table of DEFAULT_BASE_CAPACITY
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher,
@@ -44,29 +44,23 @@ public:
 		float maxLoadFactor = DEFAULT_MAX_LOAD_FACTOR,
 		float minLoadFactor = DEFAULT_MIN_LOAD_FACTOR);
 	virtual ~HashTable();
-
 	// if an equivalent item is not already present, insert item at proper location and return true
 	// if an equivalent item is already present, leave table unchanged and return false
 	bool insert(T* item);
-
 	// if an equivalent item is already present, replace item and return true
 	// if an equivalent item is not already present, leave table unchanged and return false
 	bool replace(T* item);
-
 	// if an equivalent item is already present, remove item and return true
 	// if an equivalent item is not already present, leave table unchanged and return false
 	bool remove(T* item);
-
 	// if an equivalent item is present, return a copy of the item
 	// if an equivalent item is not present, throw a new ExceptionHashTableAccess
 	T find(const T* item) const;
-
 	unsigned long getSize() const;						// returns the current number of items in the table
 	unsigned long getBaseCapacity() const;				// returns the current base capacity of the table
 	unsigned long getTotalCapacity() const;				// returns the current total capacity of the table
 	float getLoadFactor() const;						// returns the current load factor of the table
 	unsigned long getBucketNumber(const T* item) const;	// returns the bucket number for an item using its hash function mod array size
-
 };
 
 //private methods:
@@ -91,6 +85,41 @@ void HashTable<T>::deleteTable()
 	delete table;
 }
 
+template <typename T>
+void HashTable<T>::expandTable()
+{
+	++scheduleIndex;
+	table = initializeTable(SCHEDULE[scheduleIndex], comparator);
+}
+
+template <typename T>
+void HashTable<T>::contractTable()
+{
+	--scheduleIndex;
+	table = initializeTable(SCHEDULE[scheduleIndex], comparator);
+}
+
+template <typename T>
+void HashTable<T>::resizeTable()
+{
+	if (getLoadFactor() >= maxLoadFactor)
+	{
+		++scheduleIndex;
+		baseCapacity = SCHEDULE[scheduleIndex];
+		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
+		table = newTable;
+		delete newTable;
+	}
+	else if (getLoadFactor() <= minLoadFactor)
+	{
+		--scheduleIndex;
+		baseCapacity = SCHEDULE[scheduleIndex];
+		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
+		table = newTable;
+		delete newTable;
+	}
+}
+
 //public methods:
 template <typename T>
 HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher)
@@ -108,8 +137,16 @@ HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher, unsigned l
 	this->hasher = hasher;
 	this->maxLoadFactor = maxLoadFactor;
 	this->minLoadFactor = minLoadFactor;
+	unsigned int tempCapacity = (((int)(((float)size) / maxLoadFactor)) + 1); // this line is from the groupme, i know it looks terrible
+	for (int i = SCHEDULE_SIZE; i >= 0; --i)
+	{
+		if (tempCapacity <= SCHEDULE[i])
+		{
+			scheduleIndex = i;
+		}
+	}
+	baseCapacity = SCHEDULE[scheduleIndex];
 	table = initializeTable(baseCapacity, comparator);
-	//TODO: make the table base capacity adequate for no resizing
 }
 
 template <typename T>
@@ -130,7 +167,7 @@ bool HashTable<T>::insert(T* item)
 		{
 			++totalCapacity; //increment capacity if overflowing
 		}
-		//TODO: resizeTable();
+		resizeTable();
 		return true;
 	}
 	return false; //failure, item alread exists in the bucket
@@ -160,7 +197,7 @@ bool HashTable<T>::remove(T* item)
 		{
 			--totalCapacity;
 		}
-		//TODO: resizeTable();
+		resizeTable();
 		return true;
 	}
 	return false;
