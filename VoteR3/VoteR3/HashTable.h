@@ -215,7 +215,7 @@ T HashTable<T>::find(const T* item) const
 	{
 		return table[bucketIndex]->find(item);
 	}
-	catch(ExceptionLinkedListAccess()) //failure to find
+	catch(ExceptionLinkedListAccess* e) //failure to find
 	{
 		throw new ExceptionHashTableAccess();
 	}
@@ -248,7 +248,7 @@ float HashTable<T>::getLoadFactor() const
 template <typename T>
 unsigned long HashTable<T>::getBucketNumber(const T* item) const
 {
-	return hasher->hash(*item) / baseCapacity;
+	return hasher->hash(*item) % baseCapacity;
 }
 
 #endif // !HASH_TABLE
