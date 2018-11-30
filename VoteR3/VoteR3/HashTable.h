@@ -34,7 +34,8 @@ private:
 	OULinkedList<T>** initializeTable(unsigned long capacity, Comparator<T>* comparator);
 	void deleteTable();
 	void copyTable(OULinkedList<T>** newTable);
-	void resizeTable();
+	bool expandTable();
+	bool shrinkTable();
 public:
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher);			// creates an empty table of DEFAULT_BASE_CAPACITY
 	HashTable(Comparator<T>* comparator, Hasher<T>* hasher,
@@ -99,12 +100,12 @@ void HashTable<T>::copyTable(OULinkedList<T>** newTable)
 		}
 		delete chainEnumerator;
 	}
+	//delete table;
 	table = newTable;
-	//newTable = NULL;
 }
 
 template <typename T>
-void HashTable<T>::resizeTable()
+bool HashTable<T>::expandTable()
 {
 	if (getLoadFactor() >= maxLoadFactor)
 	{
@@ -112,14 +113,23 @@ void HashTable<T>::resizeTable()
 		baseCapacity = SCHEDULE[scheduleIndex];
 		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
 		copyTable(newTable);
+		return true;
 	}
-	else if (getLoadFactor() <= minLoadFactor)
+	return false;
+}
+
+template <typename T>
+bool HashTable<T>::shrinkTable()
+{
+	if (getLoadFactor() <= minLoadFactor)
 	{
 		--scheduleIndex;
 		baseCapacity = SCHEDULE[scheduleIndex];
 		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
 		copyTable(newTable);
+		return true;
 	}
+	return false;
 }
 
 //public methods:
@@ -169,7 +179,7 @@ bool HashTable<T>::insert(T* item)
 		{
 			++totalCapacity; //increment capacity if overflowing
 		}
-		resizeTable();
+		expandTable();
 		return true;
 	}
 	return false; //failure, item alread exists in the bucket
@@ -199,7 +209,7 @@ bool HashTable<T>::remove(T* item)
 		{
 			--totalCapacity;
 		}
-		resizeTable();
+		shrinkTable();
 		return true;
 	}
 	return false;
@@ -254,16 +264,19 @@ void HashTable<T>::printTable()
 {
 	for (unsigned long i = 0; i < baseCapacity; ++i)
 	{
-		int bucketNum;
-		bucketNum = getBucketNumber(new T(table[i]->get()));
-		std::cout << bucketNum << ": ";
-		OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
-		std::cout << chainEnumerator->next();
-		while (chainEnumerator->hasNext())
+		if (table[i]->getSize() > 0)
 		{
-			std::cout << "OVERFLOW: " << chainEnumerator->next() << "\n";
+			unsigned long bucketNum;
+			bucketNum = getBucketNumber(new T(table[i]->get()));
+			std::cout << bucketNum << ": ";
+			OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
+			std::cout << chainEnumerator->next() << "\n";
+			while (chainEnumerator->hasNext())
+			{
+				std::cout << "OVERFLOW: " << chainEnumerator->next() << "\n";
+			}
+			std::cout << "\n\n";
 		}
-		std::cout << "\n\n";
 	}
 }
 

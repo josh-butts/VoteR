@@ -25,13 +25,9 @@ public:
 template <typename T>
 void HashTableEnumerator<T>::findNextItem()
 {
-	while (!chainEnumerator->hasNext()) //while at the end of a list/in an empty list
+	while (!chainEnumerator->hasNext() && bucket < hashTable->baseCapacity - 1) //while at the end of a list/in an empty list
 	{
-		++bucket; //move to the next bucket
-		if (bucket >= hashTable->baseCapacity) //throw exception if end of table is reached
-		{
-			throw new ExceptionEnumerationBeyondEnd();
-		}
+		++bucket; //move to next bucket
 		chainEnumerator = new OULinkedListEnumerator<T>(hashTable->table[bucket]->enumerator()); //update the enumerator to the next bucket
 	}
 }
