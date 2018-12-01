@@ -143,6 +143,7 @@ bool OULinkedList<T>::append(const T* item)
 template <typename T>
 bool OULinkedList<T>::replace(T* item)
 {
+	/*
 	OULink<T>* current = first;
 	while (current != NULL)
 	{
@@ -155,6 +156,13 @@ bool OULinkedList<T>::replace(T* item)
 		current = current->next;
 	}
 	return false; //item not found
+	*/
+	if (remove(item))
+	{
+		insert(item);
+		return true;
+	}
+	return false;
 }
 
 template <typename T>
