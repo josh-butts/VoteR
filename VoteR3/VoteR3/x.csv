@@ -1,4 +1,5 @@
 record_id,source_id,county_code,parent_source,apps_received,new_registrations,name_changes,address_changes,party_changes,regis_updates,rej_apps,county_desc,description,rej_dupes,nonrej_dupes,apps_received_prior,new_registrations_prior,name_changes_prior,address_changes_prior,party_changes_prior,regis_updates_prior,rej_apps_prior,rej_dupes_prior,nonrej_dupes_prior
+0,000010057,01,PA,0,0,9,0,0,0,0,01 - ADAIR,Public Assistance (Unspecified),0,0,0,0,0,0,0,0,0,0,1
 1,000010007,01,PA,0,0,0,0,0,0,0,01 - ADAIR,Public Assistance (Unspecified),0,0,0,0,0,0,0,0,0,0,1
 2,000034000,01,PA,4,2,0,2,2,3,0,01 - ADAIR,Health Dept. Print,0,0,0,1,0,0,0,0,0,0,0
 3,000034001,01,PA,0,0,0,0,0,0,0,01 - ADAIR,Health Dept. Web,0,0,0,0,0,0,0,0,0,0,0

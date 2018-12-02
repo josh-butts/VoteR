@@ -12,25 +12,14 @@ private:
 	unsigned long bucket = 0;								// the current bucket during the enumeration process
 	OULinkedListEnumerator<T>* chainEnumerator = NULL;		// used to move through the linked list of the current bucket
 	HashTable<T>* hashTable = NULL;							// pointer to the HashTable being enumerated
-	void findNextItem();									// moves the enumerator to the next available item
 public:
 	HashTableEnumerator(HashTable<T>* hashTable);			// constructor needs a pointer to the HashTable to be enumerated
 	virtual ~HashTableEnumerator();
 	bool hasNext() const;									// true if there are elements that have not yet been returned via next()
 	T next();												// throws ExceptionEnumerationBeyondEnd if no next item is available
 	T peek() const;											// throws ExceptionEnumerationBeyondEnd if no next item is available
+	void findNextItem();									// moves the enumerator to the next available item
 };
-
-//private methods:
-template <typename T>
-void HashTableEnumerator<T>::findNextItem()
-{
-	while (!chainEnumerator->hasNext() && bucket < hashTable->baseCapacity - 1) //while at the end of a list/in an empty list
-	{
-		++bucket; //move to next bucket
-		chainEnumerator = new OULinkedListEnumerator<T>(hashTable->table[bucket]->enumerator()); //update the enumerator to the next bucket
-	}
-}
 
 //public methods:
 template <typename T>
@@ -67,6 +56,16 @@ template <typename T>
 T HashTableEnumerator<T>::peek() const
 {
 	return chainEnumerator->peek();
+}
+
+template <typename T>
+void HashTableEnumerator<T>::findNextItem()
+{
+	while (!chainEnumerator->hasNext() && bucket < hashTable->baseCapacity - 1) //while at the end of a list/in an empty list
+	{
+		++bucket; //move to next bucket
+		chainEnumerator = new OULinkedListEnumerator<T>(hashTable->table[bucket]->enumerator()); //update the enumerator to the next bucket
+	}
 }
 
 #endif // !HASH_TABLE_ENUMERATOR

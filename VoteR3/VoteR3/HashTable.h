@@ -33,7 +33,7 @@ private:
 	// The following method headers are from Dr. Hougen's lecture:
 	OULinkedList<T>** initializeTable(unsigned long capacity, Comparator<T>* comparator);
 	void deleteTable();
-	void copyTable(OULinkedList<T>** newTable);
+	void copyTable(unsigned long oldBaseCap);
 	bool expandTable();
 	bool shrinkTable();
 public:
@@ -69,12 +69,12 @@ public:
 template <typename T>
 OULinkedList<T>** HashTable<T>::initializeTable(unsigned long capacity, Comparator<T>* comparator)
 {
-	table = new OULinkedList<T>*[capacity]; //array of pointers to linked lists
+	OULinkedList<T>** newTable = new OULinkedList<T>*[capacity]; //array of pointers to linked lists
 	for (unsigned int i = 0; i < capacity; ++i) //loop through the table and initialize the linked lists
 	{
-		table[i] = new OULinkedList<T>(comparator);
+		newTable[i] = new OULinkedList<T>(comparator);
 	}
-	return table;
+	return newTable;
 }
 
 template <typename T>
@@ -88,17 +88,21 @@ void HashTable<T>::deleteTable()
 }
 
 template <typename T>
-void HashTable<T>::copyTable(OULinkedList<T>** newTable)
+void HashTable<T>::copyTable(unsigned long oldBaseCap)
 {
-	for (unsigned int i = 0; i < baseCapacity; ++i)
+	OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
+	for (unsigned int i = 0; i < oldBaseCap; ++i)
 	{
-		OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
-		while (chainEnumerator->hasNext())
+		if (table[i]->getSize() > 0)
 		{
-			unsigned long bucketNum = getBucketNumber(new T(chainEnumerator->peek()));
-			newTable[bucketNum]->insert(new T(chainEnumerator->next()));
+			OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
+			while (chainEnumerator->hasNext())
+			{
+				unsigned long bucketNum = getBucketNumber(new T(chainEnumerator->peek()));
+				newTable[bucketNum]->insert(new T(chainEnumerator->next()));
+			}
+			delete chainEnumerator;
 		}
-		delete chainEnumerator;
 	}
 	//delete table;
 	table = newTable;
@@ -110,9 +114,9 @@ bool HashTable<T>::expandTable()
 	if (getLoadFactor() >= maxLoadFactor)
 	{
 		++scheduleIndex;
+		unsigned long oldBaseCap = baseCapacity;
 		baseCapacity = SCHEDULE[scheduleIndex];
-		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
-		copyTable(newTable);
+		copyTable(oldBaseCap);
 		return true;
 	}
 	return false;
@@ -223,7 +227,7 @@ T HashTable<T>::find(const T* item) const
 	{
 		return table[bucketIndex]->find(item);
 	}
-	catch(ExceptionLinkedListAccess* e) //failure to find
+	catch(ExceptionLinkedListAccess) //failure to find
 	{
 		throw new ExceptionHashTableAccess();
 	}
