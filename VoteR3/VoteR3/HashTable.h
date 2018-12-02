@@ -7,6 +7,9 @@
 #include "OULinkedListEnumerator.h"
 #include "Hasher.h"
 #include "NvraRecord.h"
+#include <iostream>
+#include <fstream>
+#include <string>
 
 const unsigned int SCHEDULE_SIZE = 25;			// the number of items in the size schedule
 const unsigned int SCHEDULE[SCHEDULE_SIZE] = { 1, 2, 5, 11, 23, 53, 107, 223, 449, 907, 1823, 3659, 7309, 14621, 29243, 58511, 117023, 234067, 468157, 936319, 1872667, 3745283, 7490573, 14981147, 29962343 };		// the size schedule (all primes)
@@ -63,6 +66,7 @@ public:
 	unsigned long getBucketNumber(const T* item) const;	// returns the bucket number for an item using its hash function mod array size
 
 	void printTable(); //prints the contents of the hash table
+	void printTable(std::ofstream* outFile); //prints hash table to a file
 };
 
 //private methods:
@@ -104,7 +108,7 @@ void HashTable<T>::copyTable(unsigned long oldBaseCap)
 			delete chainEnumerator;
 		}
 	}
-	//delete table;
+	delete table;
 	table = newTable;
 }
 
@@ -128,9 +132,9 @@ bool HashTable<T>::shrinkTable()
 	if (getLoadFactor() <= minLoadFactor)
 	{
 		--scheduleIndex;
+		unsigned long oldBaseCap = baseCapacity;
 		baseCapacity = SCHEDULE[scheduleIndex];
-		OULinkedList<T>** newTable = initializeTable(baseCapacity, comparator);
-		copyTable(newTable);
+		copyTable(oldBaseCap);
 		return true;
 	}
 	return false;
@@ -279,9 +283,35 @@ void HashTable<T>::printTable()
 			{
 				std::cout << "OVERFLOW: " << chainEnumerator->next() << "\n";
 			}
-			std::cout << "\n\n";
+			std::cout << "\n";
 		}
 	}
+	std::cout << "Base Capacity: " << baseCapacity << "; Total Capacity: " << totalCapacity << "; LoadFactor: "
+		<< getLoadFactor() << "\n";
+}
+
+
+template <typename T>
+void HashTable<T>::printTable(std::ofstream* outFile)
+{
+	for (unsigned long i = 0; i < baseCapacity; ++i)
+	{
+		if (table[i]->getSize() > 0)
+		{
+			unsigned long bucketNum;
+			bucketNum = getBucketNumber(new T(table[i]->get()));
+			*outFile << bucketNum << ": ";
+			OULinkedListEnumerator<T>* chainEnumerator = new OULinkedListEnumerator<T>(table[i]->enumerator());
+			*outFile << chainEnumerator->next() << "\n";
+			while (chainEnumerator->hasNext())
+			{
+				*outFile << "OVERFLOW: " << chainEnumerator->next() << "\n";
+			}
+			*outFile << "\n";
+		}
+	}
+	*outFile << "Base Capacity: " << baseCapacity << "; Total Capacity: " << totalCapacity << "; LoadFactor: "
+		<< getLoadFactor() << "\n";
 }
 
 #endif // !HASH_TABLE
