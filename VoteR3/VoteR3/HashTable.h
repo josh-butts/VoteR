@@ -157,10 +157,13 @@ HashTable<T>::HashTable(Comparator<T>* comparator, Hasher<T>* hasher, unsigned l
 	this->hasher = hasher;
 	this->maxLoadFactor = maxLoadFactor;
 	this->minLoadFactor = minLoadFactor;
-	unsigned int tempCapacity = (((int)(((float)size) / maxLoadFactor)) + 1);
+	//expected size = given size * (1/maxloadfactor) and round up
+	//expected size used to determine which element of schedule to use
+	unsigned int expectedSize = (((int)(((float)size) / maxLoadFactor)) + 1);
+	//unsigned int expectedSize = (unsigned int)((size * (1.f / maxLoadFactor)) + 1);
 	for (int i = SCHEDULE_SIZE; i >= 0; --i) // loop finds the base capacity
 	{
-		if (tempCapacity <= SCHEDULE[i])
+		if (expectedSize <= SCHEDULE[i])
 		{
 			scheduleIndex = i;
 		}
