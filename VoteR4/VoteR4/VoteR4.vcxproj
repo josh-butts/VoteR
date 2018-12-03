@@ -152,36 +152,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\VoteR3\VoteR3\NvraComparator.cpp" />
-    <ClCompile Include="..\..\VoteR3\VoteR3\NvraHasher.cpp" />
-    <ClCompile Include="..\..\VoteR3\VoteR3\NvraRecord.cpp" />
+    <ClCompile Include="NvraComparator.cpp" />
+    <ClCompile Include="NvraHasher.cpp" />
+    <ClCompile Include="NvraRecord.cpp" />
     <ClCompile Include="VoteR4.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\VoteR3\VoteR3\Comparator.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\Enumerator.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\Hasher.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\HashTable.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\HashTableEnumerator.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\NvraComparator.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\NvraHasher.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\NvraRecord.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\OULink.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\OULinkedList.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\OULinkedListEnumerator.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\Search.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\Sorter.h" />
-    <ClInclude Include="..\..\VoteR3\VoteR3\TemplatedArray.h" />
     <ClInclude Include="AVLTree.h" />
     <ClInclude Include="AVLTreeEnumerator.h" />
     <ClInclude Include="AVLTreeOrder.h" />
+    <ClInclude Include="Comparator.h" />
+    <ClInclude Include="Enumerator.h" />
     <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="Hasher.h" />
+    <ClInclude Include="HashTable.h" />
+    <ClInclude Include="HashTableEnumerator.h" />
+    <ClInclude Include="NvraComparator.h" />
+    <ClInclude Include="NvraHasher.h" />
+    <ClInclude Include="NvraRecord.h" />
+    <ClInclude Include="OULink.h" />
+    <ClInclude Include="OULinkedList.h" />
+    <ClInclude Include="OULinkedListEnumerator.h" />
+    <ClInclude Include="Search.h" />
+    <ClInclude Include="Sorter.h" />
+    <ClInclude Include="TemplatedArray.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\VoteR3\VoteR3\partial1.csv" />
-    <None Include="..\..\VoteR3\VoteR3\partial4.csv" />
-    <None Include="..\..\VoteR3\VoteR3\partial4_duplicates.csv" />
-    <None Include="..\..\VoteR3\VoteR3\x.csv" />
+    <None Include="partial1.csv" />
+    <None Include="partial4.csv" />
+    <None Include="partial4_duplicates.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

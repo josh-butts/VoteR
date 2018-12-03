@@ -5,26 +5,26 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VoteR4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\VoteR3\VoteR3\NvraComparator.cpp">
+    <ClCompile Include="NvraComparator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\VoteR3\VoteR3\NvraHasher.cpp">
+    <ClCompile Include="NvraHasher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\VoteR3\VoteR3\NvraRecord.cpp">
+    <ClCompile Include="NvraRecord.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,60 +41,57 @@
     <ClInclude Include="Exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\Comparator.h">
+    <ClInclude Include="Comparator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\Enumerator.h">
+    <ClInclude Include="Enumerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\Hasher.h">
+    <ClInclude Include="Hasher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\HashTable.h">
+    <ClInclude Include="HashTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\HashTableEnumerator.h">
+    <ClInclude Include="HashTableEnumerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\NvraComparator.h">
+    <ClInclude Include="NvraComparator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\NvraHasher.h">
+    <ClInclude Include="NvraHasher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\NvraRecord.h">
+    <ClInclude Include="NvraRecord.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\OULink.h">
+    <ClInclude Include="OULink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\OULinkedList.h">
+    <ClInclude Include="OULinkedList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\OULinkedListEnumerator.h">
+    <ClInclude Include="OULinkedListEnumerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\Search.h">
+    <ClInclude Include="Search.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\Sorter.h">
+    <ClInclude Include="Sorter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VoteR3\VoteR3\TemplatedArray.h">
+    <ClInclude Include="TemplatedArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\VoteR3\VoteR3\partial1.csv">
+    <None Include="partial1.csv">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\..\VoteR3\VoteR3\partial4.csv">
+    <None Include="partial4.csv">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="..\..\VoteR3\VoteR3\partial4_duplicates.csv">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\..\VoteR3\VoteR3\x.csv">
+    <None Include="partial4_duplicates.csv">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
