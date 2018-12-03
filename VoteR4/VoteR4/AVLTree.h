@@ -14,10 +14,10 @@ private:
 	int diff = 0;									// height of right minus height of left
 	AVLTree<T>* left = NULL;						// pointer to left subtree
 	AVLTree<T>* right = NULL;						// pointer to right subtree
-	void zig();										// right rotation
-	void zag();										// left rotation
-	void zigzag();									// left rotation on left subtree, followed by right rotation
-	void zagzig();									// right rotation on right subtree, followed by left rotation
+	void right();									// right rotation
+	void left();									// left rotation
+	void rightLeft();								// left rotation on left subtree, followed by right rotation
+	void leftRight();								// right rotation on right subtree, followed by left rotation
 	void rebalance();								// check for and rebalance this node, if needed
 public:
 	AVLTree(Comparator<T>* comparator);				// creates empty linked tree with comparator
@@ -42,9 +42,79 @@ public:
 	unsigned long getSize() const;				// returns the current number of items in the tree
 };
 
-// add public functions here
+//Public:
+template <typename T>
+AVLTree<T>::AVLTree(Comparator<T>* comparator)
+{
+	this->comparator = comparator;
 
+}
 
-// add additional private functions here
+template <typename T>
+AVLTree<T>::~AVLTree()
+{
+
+}
+
+template <typename T>
+bool AVLTree<T>::insert(const T* item)
+{
+
+}
+
+template <typename T>
+bool AVLTree<T>::replace(const T* item)
+{
+
+}
+
+template <typename T>
+bool AVLTree<T>::remove(const T* item)
+{
+
+}
+
+template <typename T>
+T AVLTree<T>::find(const T* item) const
+{
+
+}
+
+template <typename T>
+unsigned long AVLTree<T>::getSize() const
+{
+
+}
+
+//Private:
+template <typename T>
+void AVLTree<T>::right()
+{
+
+}
+
+template <typename T>
+void AVLTree<T>::left()
+{
+
+}
+
+template <typename T>
+void AVLTree<T>::rightLeft()
+{
+
+}
+
+template <typename T>
+void AVLTree<T>::leftRight()
+{
+
+}
+
+template <typename T>
+void AVLTree<T>::rebalance()
+{
+
+}
 
 #endif // !AVL_TREE

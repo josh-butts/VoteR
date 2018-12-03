@@ -22,6 +22,48 @@ public:
 	AVLTreeOrder getOrder();		// returns the order of this enumerator (preorder, inorder, or postorder)
 };
 
-// put implementation here
+//Public:
+template <typename T>
+AVLTreeEnumerator<T>::AVLTreeEnumerator(const AVLTree<T>* root, AVLTreeOrder order)
+{
+
+}
+
+template <typename T>
+AVLTreeEnumerator<T>::~AVLTreeEnumerator()
+{
+
+}
+
+template <typename T>
+bool AVLTreeEnumerator<T>::hasNext() const
+{
+
+}
+
+template <typename T>
+T AVLTreeEnumerator<T>::next()
+{
+
+}
+
+template <typename T>
+T AVLTreeEnumerator<T>::peek() const
+{
+
+}
+
+template <typename T>
+AVLTreeOrder AVLTreeEnumerator<T>::getOrder()
+{
+
+}
+
+//Private:
+template <typename T>
+void AVLTreeEnumerator<T>::buildTraversalStack(const AVLTree<T>* current)
+{
+
+}
 
 #endif // !AVL_TREE_ENUMERATOR
