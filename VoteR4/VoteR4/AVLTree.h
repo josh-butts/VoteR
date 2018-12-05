@@ -19,6 +19,7 @@ private:
 	void zigRightZagLeft();							// left rotation on left subtree, followed by right rotation
 	void zagLeftZigRight();							// right rotation on right subtree, followed by left rotation
 	void rebalance();								// check for and rebalance this node, if needed
+	int getHeight();
 public:
 	AVLTree(Comparator<T>* comparator);				// creates empty linked tree with comparator
 	virtual ~AVLTree();								// deletes all links and their data items
@@ -226,6 +227,26 @@ template <typename T>
 void AVLTree<T>::rebalance()
 {
 
+}
+
+template <typename T>
+int AVLTree<T>::getHeight()
+{
+	if (this == NULL) //subtree does not exist
+	{
+		return -1;
+	}
+	else
+	{
+		if (right->getHeight() > left->getHeight()) //returns 1 plus the maximum of right's height and left's height
+		{
+			return 1 + right->getHeight();
+		}
+		else
+		{
+			return 1 + left->getHeight();
+		}
+	}
 }
 
 #endif // !AVL_TREE
