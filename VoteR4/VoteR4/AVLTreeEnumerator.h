@@ -27,6 +27,7 @@ template <typename T>
 AVLTreeEnumerator<T>::AVLTreeEnumerator(const AVLTree<T>* root, AVLTreeOrder order)
 {
 	this->order = order;
+	buildTraversalStack(root);
 }
 
 template <typename T>
@@ -63,6 +64,7 @@ AVLTreeOrder AVLTreeEnumerator<T>::getOrder()
 template <typename T>
 void AVLTreeEnumerator<T>::buildTraversalStack(const AVLTree<T>* current)
 {
+	if (current == NULL) return;
 
 }
 

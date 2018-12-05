@@ -57,14 +57,10 @@ AVLTree<T>::~AVLTree()
 	if (left != NULL) delete left;
 	right = NULL;
 	left = NULL;
-	data = NULL;
-	comparator = NULL;
-	size = NULL;
-	diff = NULL;
 }
 
 template <typename T>
-bool AVLTree<T>::insert(const T* item) //TODO: this does not contain rebalancing code
+bool AVLTree<T>::insert(const T* item) //The following code is adapted from Cameron Bost
 {
 	if (data == NULL) //has no data, base case
 	{
@@ -75,34 +71,55 @@ bool AVLTree<T>::insert(const T* item) //TODO: this does not contain rebalancing
 	}
 	else if (comparator->compare(T(*data), T(*item)) == -1) //subtree belongs to the right
 	{
+		bool success;
 		if (right == NULL) //if there is no right subtree
 		{
 			right = new AVLTree<T>(comparator); //initialize it
-			// insert
+			right->insert(item);
 			++size;
 			++diff;
 		}
 		else 
 		{
-			// oldDiff = right.diff
-			// success = right.insert(item)
-			// if (oldDIff != right.diff && right.diff != 0)
-			//		++diff
-			//		
+			int oldDiff = right->diff;
+			success = right->insert(item);
+			if (oldDiff != right->diff && right->diff != 0)
+			{
+				++diff;
+			}		
 		}
-		//return right->insert(item); //insert the item on the right
-		// if (success)
-		//		++size;
-		//		rebalance();
-		//return success;
+		if (success)
+		{
+			++size;
+			rebalance();
+		}
+		return success;
 	}
 	else if (comparator->compare(T(*data), T(*item)) == 1) //subtree belongs to the left
 	{
+		bool success;
 		if (left == NULL) //there is no left
 		{
 			left = new AVLTree<T>(comparator); //initialize it
+			left->insert(item);
+			++size;
+			--diff;
 		}
-		return left->insert(item); //insert item on the left
+		else
+		{
+			int oldDiff = left->diff;
+			success = left->insert(item);
+			if (oldDiff != left->diff && left->diff != 0)
+			{
+				--diff;
+			}
+		}
+		if (success)
+		{
+			++size;
+			rebalance();
+		}
+		return success;
 	}
 	else return false; //data already exists
 }
@@ -132,7 +149,7 @@ template <typename T>
 bool AVLTree<T>::remove(const T* item) //EXTRA CREDIT
 {
 	if (data == NULL) return false; //data not found
-
+	return true;
 
 }
 
@@ -229,13 +246,15 @@ void AVLTree<T>::zagLeft()
 template <typename T>
 void AVLTree<T>::zigRightZagLeft()
 {
-
+	zigRight();
+	zagLeft();
 }
 
 template <typename T>
 void AVLTree<T>::zagLeftZigRight()
 {
-
+	zagLeft();
+	zigRight();
 }
 
 template <typename T>
