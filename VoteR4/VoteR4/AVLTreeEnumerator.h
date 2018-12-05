@@ -26,7 +26,7 @@ public:
 template <typename T>
 AVLTreeEnumerator<T>::AVLTreeEnumerator(const AVLTree<T>* root, AVLTreeOrder order)
 {
-
+	this->order = order;
 }
 
 template <typename T>
@@ -56,7 +56,7 @@ T AVLTreeEnumerator<T>::peek() const
 template <typename T>
 AVLTreeOrder AVLTreeEnumerator<T>::getOrder()
 {
-
+	return order;
 }
 
 //Private:

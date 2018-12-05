@@ -68,20 +68,35 @@ bool AVLTree<T>::insert(const T* item) //TODO: this does not contain rebalancing
 {
 	if (data == NULL) //has no data, base case
 	{
-		data = item; //give it the data
+		data = new T(*item); //give it the data
 		++size;	//increment size
 		//rebalance();
 		return true;
 	}
-	else if (comparator->compare(data, item) == -1) //subtree belongs to the right
+	else if (comparator->compare(T(*data), T(*item)) == -1) //subtree belongs to the right
 	{
 		if (right == NULL) //if there is no right subtree
 		{
 			right = new AVLTree<T>(comparator); //initialize it
+			// insert
+			++size;
+			++diff;
 		}
-		return right->insert(item); //insert the item on the right
+		else 
+		{
+			// oldDiff = right.diff
+			// success = right.insert(item)
+			// if (oldDIff != right.diff && right.diff != 0)
+			//		++diff
+			//		
+		}
+		//return right->insert(item); //insert the item on the right
+		// if (success)
+		//		++size;
+		//		rebalance();
+		//return success;
 	}
-	else if (comparator->compare(data, item) == 1) //subtree belongs to the left
+	else if (comparator->compare(T(*data), T(*item)) == 1) //subtree belongs to the left
 	{
 		if (left == NULL) //there is no left
 		{
@@ -96,19 +111,19 @@ template <typename T>
 bool AVLTree<T>::replace(const T* item)
 {
 	if (data == NULL) return false; //data not found
-	else if (comparator->compare(data, item) == -1) //subtree belongs to the right
+	else if (comparator->compare(T(*data), T(*item)) == -1) //subtree belongs to the right
 	{
 		if (right == NULL) return false; //no right subtree
-		return right->find(item); //look on the right
+		right->replace(item); //look on right
 	}
-	else if (comparator->compare(data, item) == 1) //subtree belongs to the left
+	else if (comparator->compare(T(*data), T(*item)) == 1) //subtree belongs to the left
 	{
 		if (left == NULL) return false; //no left subtree
-		return left->find(item); //look on the left
+		left->replace(item); //look on the left
 	}
 	else //item matches subtree data
 	{
-		data = item; //replace it
+		data = new T(*item); //replace it
 		return true;
 	}
 }
@@ -124,18 +139,18 @@ bool AVLTree<T>::remove(const T* item) //EXTRA CREDIT
 template <typename T>
 T AVLTree<T>::find(const T* item) const
 {
-	if (data == NULL) return false; //data not found
-	else if (comparator->compare(data, item) == -1) //subtree belongs to the right
+	if (data == NULL) throw new ExceptionAVLTreeAccess(); //data not found
+	else if (comparator->compare(T(*data), T(*item)) == -1) //subtree belongs to the right
 	{
-		if (right == NULL) return false; //no right subtree
-		return right->find(item); //look on the right
+		if (right == NULL) throw new ExceptionAVLTreeAccess(); //no right subtree
+		right->find(item); //look on the right
 	}
-	else if (comparator->compare(data, item) == 1) //subtree belongs to the left
+	else if (comparator->compare(T(*data), T(*item)) == 1) //subtree belongs to the left
 	{
-		if (left == NULL) return false; //no left subtree
-		return left->find(item); //look on the left
+		if (left == NULL) throw new ExceptionAVLTreeAccess(); //no left subtree
+		left->find(item); //look on the left
 	}
-	else return data; //item matches subtree data
+	else return *data; //item matches subtree data
 }
 
 template <typename T>
@@ -226,7 +241,11 @@ void AVLTree<T>::zagLeftZigRight()
 template <typename T>
 void AVLTree<T>::rebalance()
 {
-
+	//4 cases: zig, zag, zigzag, zagzig
+	//called on root
+	//if dif = 2, check right subtree
+	//if right subtree diff is 1 or zero, zagRight()
+	//if right subtree diff is -1, 
 }
 
 template <typename T>
