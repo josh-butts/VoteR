@@ -47,31 +47,75 @@ template <typename T>
 AVLTree<T>::AVLTree(Comparator<T>* comparator)
 {
 	this->comparator = comparator;
-
 }
 
 template <typename T>
 AVLTree<T>::~AVLTree()
 {
-
+	if (right != NULL) delete right;
+	if (left != NULL) delete left;
+	right = NULL;
+	left = NULL;
+	data = NULL;
+	comparator = NULL;
+	size = NULL;
+	diff = NULL;
 }
 
 template <typename T>
-bool AVLTree<T>::insert(const T* item)
+bool AVLTree<T>::insert(const T* item) //TODO: this does not contain rebalancing code
 {
-
+	if (data == NULL) //has no data, base case
+	{
+		data = item; //give it the data
+		++size;	//increment size
+		//rebalance();
+		return true;
+	}
+	else if (comparator->compare(data, item) == -1) //subtree belongs to the right
+	{
+		if (right == NULL) //if there is no right subtree
+		{
+			right = new AVLTree<T>(comparator); //initialize it
+		}
+		return right->insert(item); //insert the item on the right
+	}
+	else if (comparator->compare(data, item) == 1) //subtree belongs to the left
+	{
+		if (left == NULL) //there is no left
+		{
+			left = new AVLTree<T>(comparator); //initialize it
+		}
+		return left->insert(item); //insert item on the left
+	}
+	else return false; //data already exists
 }
 
 template <typename T>
 bool AVLTree<T>::replace(const T* item)
 {
-
+	if (data == NULL) return false; //data not found
+	else if (comparator->compare(data, item) == -1) //subtree belongs to the right
+	{
+		if (right == NULL) return false; //no right subtree
+		return right->find(item); //look on the right
+	}
+	else if (comparator->compare(data, item) == 1) //subtree belongs to the left
+	{
+		if (left == NULL) return false; //no left subtree
+		return left->find(item); //look on the left
+	}
+	else //item matches subtree data
+	{
+		data = item; //replace it
+		return true;
+	}
 }
 
 template <typename T>
-bool AVLTree<T>::remove(const T* item)
+bool AVLTree<T>::remove(const T* item) //EXTRA CREDIT
 {
-	if (data == NULL) return false;
+	if (data == NULL) return false; //data not found
 
 
 }
@@ -79,13 +123,24 @@ bool AVLTree<T>::remove(const T* item)
 template <typename T>
 T AVLTree<T>::find(const T* item) const
 {
-
+	if (data == NULL) return false; //data not found
+	else if (comparator->compare(data, item) == -1) //subtree belongs to the right
+	{
+		if (right == NULL) return false; //no right subtree
+		return right->find(item); //look on the right
+	}
+	else if (comparator->compare(data, item) == 1) //subtree belongs to the left
+	{
+		if (left == NULL) return false; //no left subtree
+		return left->find(item); //look on the left
+	}
+	else return data; //item matches subtree data
 }
 
 template <typename T>
 unsigned long AVLTree<T>::getSize() const
 {
-
+	return size;
 }
 
 //Private:
