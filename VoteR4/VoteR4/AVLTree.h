@@ -66,7 +66,7 @@ bool AVLTree<T>::insert(const T* item) //The following code is adapted from Came
 	{
 		data = new T(*item); //give it the data
 		++size;	//increment size
-		//rebalance();
+		rebalance();
 		return true;
 	}
 	else if (comparator->compare(T(*data), T(*item)) == -1) //subtree belongs to the right
@@ -81,9 +81,9 @@ bool AVLTree<T>::insert(const T* item) //The following code is adapted from Came
 		}
 		else 
 		{
-			int oldDiff = right->diff;
+			int oldDiff = right->diff; //store old diff
 			success = right->insert(item);
-			if (oldDiff != right->diff && right->diff != 0)
+			if (oldDiff != right->diff && right->diff != 0) //see if it changes after insertion
 			{
 				++diff;
 			}		
@@ -121,7 +121,11 @@ bool AVLTree<T>::insert(const T* item) //The following code is adapted from Came
 		}
 		return success;
 	}
-	else return false; //data already exists
+	else if (comparator->compare(T(*data), T(*item)) == 0)
+	{
+		return false; //data already exists
+	}
+	return false;
 }
 
 template <typename T>
@@ -138,11 +142,12 @@ bool AVLTree<T>::replace(const T* item)
 		if (left == NULL) return false; //no left subtree
 		left->replace(item); //look on the left
 	}
-	else //item matches subtree data
+	else if (comparator->compare(T(*data), T(*item)) == 0) //item matches subtree data
 	{
 		data = new T(*item); //replace it
 		return true;
 	}
+	return false;
 }
 
 template <typename T>
@@ -167,7 +172,11 @@ T AVLTree<T>::find(const T* item) const
 		if (left == NULL) throw new ExceptionAVLTreeAccess(); //no left subtree
 		left->find(item); //look on the left
 	}
-	else return *data; //item matches subtree data
+	else
+	{
+		return *data; //item matches subtree data
+	}
+	return *data;
 }
 
 template <typename T>

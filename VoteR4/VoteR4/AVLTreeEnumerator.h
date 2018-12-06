@@ -13,6 +13,7 @@ private:
 	AVLTreeOrder order;
 	std::stack<const AVLTree<T>*> traversalStack;
 	void buildTraversalStack(const AVLTree<T>* current);
+	void inOrderPush(const AVLTree<T>* node);
 public:
 	AVLTreeEnumerator(const AVLTree<T>* root, AVLTreeOrder order);
 	virtual ~AVLTreeEnumerator();
@@ -26,6 +27,9 @@ public:
 template <typename T>
 AVLTreeEnumerator<T>::AVLTreeEnumerator(const AVLTree<T>* root, AVLTreeOrder order)
 {
+	if (root == NULL || root->data == NULL) throw new ExceptionAVLTreeAccess();
+	if (order != AVLTreeOrder::inorder || order != AVLTreeOrder::postorder
+		|| order != AVLTreeOrder::preorder) throw new ExceptionAVLTreeAccess();
 	this->order = order;
 	buildTraversalStack(root);
 }
@@ -39,19 +43,21 @@ AVLTreeEnumerator<T>::~AVLTreeEnumerator()
 template <typename T>
 bool AVLTreeEnumerator<T>::hasNext() const
 {
-
+	return traversalStack.top();
 }
 
 template <typename T>
 T AVLTreeEnumerator<T>::next()
 {
-
+	T item = T(*traversalStack.top()->data); //store data;
+	traversalStack.pop(); //advance to next
+	return item;
 }
 
 template <typename T>
 T AVLTreeEnumerator<T>::peek() const
 {
-
+	return T(*traversalStack.top()->data);
 }
 
 template <typename T>
@@ -64,8 +70,28 @@ AVLTreeOrder AVLTreeEnumerator<T>::getOrder()
 template <typename T>
 void AVLTreeEnumerator<T>::buildTraversalStack(const AVLTree<T>* current)
 {
-	if (current == NULL) return;
+	if (current == NULL) throw new ExceptionAVLTreeAccess();
+	traversalStack.emplace(current);
+	if (order == AVLTreeOrder::inorder)
+	{
+		inOrderPush(current);
+	}
+	else if (order == AVLTreeOrder::postorder)
+	{
 
+	}
+	else if (order == AVLTreeOrder::preorder)
+	{
+
+	}
 }
 
+template <typename T>
+void AVLTreeEnumerator<T>::inOrderPush(const AVLTree<T>* node) //Adapted from ZyBooks
+{
+	if (node == NULL || node->data == NULL) return;
+	inOrderPush(node->right);
+	traversalStack.push(node);
+	inOrderPush(node->left);
+}
 #endif // !AVL_TREE_ENUMERATOR
