@@ -272,8 +272,15 @@ void AVLTree<T>::rebalance()
 	//4 cases: zig, zag, zigzag, zagzig
 	//called on root
 	//if dif = 2, check right subtree
-	//if right subtree diff is 1 or zero, zagRight()
+	//if right subtree diff is 1 or zero, zigRight()
 	//if right subtree diff is -1, 
+	if (diff == 2)
+	{
+		if (this->right->diff > -1)
+		{
+			zigRight();
+		}
+	}
 }
 
 template <typename T>
