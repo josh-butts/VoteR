@@ -1,6 +1,5 @@
 /*
-Josh Butts
-Project 4 VoteR 4.0
+VoteR4-2
 */
 
 #include "Exceptions.h"
@@ -9,13 +8,6 @@ Project 4 VoteR 4.0
 #include "NvraComparator.h"
 #include "Sorter.h"
 #include "Search.h"
-#include "OULink.h"
-#include "OULinkedList.h"
-#include "OULinkedListEnumerator.h"
-#include "Enumerator.h"
-#include "HashTable.h"
-#include "NvraHasher.h"
-#include "HashTableEnumerator.h"
 #include "AVLTree.h"
 #include "AVLTreeEnumerator.h"
 #include "AVLTreeOrder.h"
@@ -51,51 +43,37 @@ void checkMemory(T* item)
 	}
 }
 
-//Returns a list made from an array
-OULinkedList<NvraRecord>* arrayToList(TemplatedArray<NvraRecord>* array)
-{
-	NvraComparator* compareID = new NvraComparator(0); //comparator based on the id column
-	OULinkedList<NvraRecord>* list = new OULinkedList<NvraRecord>(compareID);
-	for (unsigned int i = 0; i < array->getSize(); ++i)
-	{
-		list->insert(new NvraRecord(array->get(i)));
-	}
-	return list;
-}
-
-//Returns an array made from a list
-TemplatedArray<NvraRecord>* listToArray(OULinkedList<NvraRecord>* list)
-{
-	TemplatedArray<NvraRecord>* array = new TemplatedArray<NvraRecord>(list->getSize());
-	OULinkedListEnumerator<NvraRecord> listEnum = list->enumerator();
-	while (listEnum.hasNext())
-	{
-		array->add(new NvraRecord(listEnum.next()));
-	}
-	return array;
-}
-
 //Determines whether an element is a number or string
 void setElementState(recordData* myRecordData)
 {
-	if (myRecordData->elementCount == 3 || myRecordData->elementCount == 11 || myRecordData->elementCount == 12)
+	if (myRecordData->elementCount == 3 || myRecordData->elementCount == 11
+		|| myRecordData->elementCount == 12) myRecordData->elementIsNum = false;
+	else myRecordData->elementIsNum = true;
+}
+
+//Adds a single element to a record
+void addElement(NvraRecord* record, metadata* metadata, recordData* recordData)
+{
+	if (recordData->elementIsNum) //element is a number
 	{
-		myRecordData->elementIsNum = false;
+		int tempInt = stoi(recordData->element);
+		if (tempInt < 0) //if the element is negative
+		{
+			std::cout << "Invalid data at line " << metadata->lineCount + 1 << ".\n"; //print invalid data error
+			recordData->isValid = false; //record contains invalid data
+		}
+		else record->addNum(tempInt); //store the int
 	}
-	else
-	{
-		myRecordData->elementIsNum = true;
-	}
+	else record->addString(recordData->element); //store the string
 }
 
 //Attempts to add a record to the list
-void addRecord(NvraRecord* record, AVLTree<NvraRecord>* tree, TemplatedArray<unsigned int>* ids, recordData* recordData,
-	metadata* metadata)
+void addRecord(NvraRecord* record, AVLTree<NvraRecord>* tree, recordData* recordData, metadata* metadata)
 {
 	if (recordData->isValid && !recordData->hasDuplicate)
 	{
-		tree->insert(record);
-		ids->add(new unsigned int(record->getNum(0)));
+		bool succ = tree->insert(record);
+		if (!succ) std::cout << "\naddRecord failed\n";
 		++metadata->memoryCount;
 		++metadata->validCount;
 		++metadata->lineCount;
@@ -111,35 +89,15 @@ void addRecord(NvraRecord* record, AVLTree<NvraRecord>* tree, TemplatedArray<uns
 	}
 }
 
-//Adds a single element to a record
-void addElement(NvraRecord* record, metadata* metadata, recordData* recordData)
-{
-	if (recordData->elementIsNum) //element is a number
-	{
-		int tempInt = stoi(recordData->element);
-		if (tempInt < 0) //if the element is negative
-		{
-			std::cout << "Invalid data at line " << metadata->lineCount + 1 << ".\n"; //print invalid data error
-			recordData->isValid = false; //record contains invalid data
-		}
-		else
-		{
-			record->addNum(tempInt); //store the int
-		}
-	}
-	else //element is a string
-	{
-		record->addString(recordData->element); //store the string
-	}
-}
-
 //Reads from a file into a linked list. Returns true if at least 1 record was read in.
-bool readFile(std::ifstream* file, AVLTree<NvraRecord>* tree, metadata* mainMetadata, TemplatedArray<unsigned int>* ids)
+bool readFile(std::ifstream* file, AVLTree<NvraRecord>* tree, metadata* mainMetadata)
 {
 	metadata* fileMetadata = new metadata;
+	checkMemory(fileMetadata);
 	NvraRecord* record = new NvraRecord; //holds a line of processed data
 	checkMemory(record);
 	recordData* myRecordData = new recordData;
+	checkMemory(myRecordData);
 	getline(*file, myRecordData->element); //throw out header
 	while (getline(*file, myRecordData->element, ',')) //gets elements separated by commas, the last element is a special case
 	{
@@ -150,17 +108,19 @@ bool readFile(std::ifstream* file, AVLTree<NvraRecord>* tree, metadata* mainMeta
 		{
 			getline(*file, myRecordData->element, '\n'); //gets last element
 			addElement(record, fileMetadata, myRecordData);
-			for (unsigned long i = 0; i < ids->getSize(); ++i) //check for duplicate ids
+			try
 			{
-				if (ids->get(i) == record->getNum(0)) //if the id matches another id
-				{
-					std::cout << "Duplicate record ID " << ids->get(i) << " at line " << fileMetadata->lineCount + 1 << ".\n";
-					myRecordData->hasDuplicate = true;
-				}
+				tree->find(record);
+				std::cout << "Duplicate record ID " << record->getNum(0) << " at line " << fileMetadata->lineCount + 1 << ".\n";
+				myRecordData->hasDuplicate = true;
 			}
-			addRecord(record, tree, ids, myRecordData, fileMetadata); //attempt to store the record
+			catch (ExceptionAVLTreeAccess*)
+			{
+			}
+			addRecord(record, tree, myRecordData, fileMetadata); //attempt to store the record
 			//reset for next line:
 			record = new NvraRecord;
+			checkMemory(record);
 			myRecordData->elementCount = 0;
 			myRecordData->isValid = true;
 			myRecordData->hasDuplicate = false;
@@ -199,30 +159,20 @@ bool openFile(std::ifstream* file)
 }
 
 //Gets the initial file from the user
-int getUserFile(AVLTree<NvraRecord>* tree, metadata* myMetadata)
+int getInitialFile(AVLTree<NvraRecord>* tree, metadata* myMetadata)
 {
 	std::string userInput;
 	std::ifstream* myFile = new std::ifstream;
+	checkMemory(myFile);
 	bool dataReadIn = false;
 	while (!dataReadIn) //exit loop if we've read in at least one record
 	{
 		if (openFile(myFile))
 		{
-			TemplatedArray<unsigned int>* ids = new TemplatedArray<unsigned int>; //holds ids
-			checkMemory(ids);
-			if (!readFile(myFile, tree, myMetadata, ids)) //file yeilds no valid records
-			{
-				std::cout << "No valid records found.";
-			}
-			else //records were stored
-			{
-				dataReadIn = true;
-			}
+			if (!readFile(myFile, tree, myMetadata)) std::cout << "No valid records found."; //file yeilds no valid records
+			else dataReadIn = true; //records were stored
 		}
-		else //user presses enter only
-		{
-			return 1;
-		}
+		else return 1; //user presses enter only
 	}
 	delete myFile;
 	return 0;
@@ -237,10 +187,7 @@ void output(AVLTree<NvraRecord>* tree, metadata* metadata) //TODO: make an outpu
 	getline(std::cin, userInput);
 	if (userInput == "") //user presses enter, print to standard out
 	{
-		while (treenumerator->hasNext())
-		{
-			std::cout << treenumerator->next() << "\n"; //print to console
-		}
+		while (treenumerator->hasNext()) std::cout << treenumerator->next() << "\n"; //print to console
 		std::cout << "Data lines read: " << metadata->lineCount << "; Valid NVRA records read: " << metadata->validCount
 			<< "; NVRA records in memory: " << metadata->memoryCount << "\n";
 	}
@@ -254,10 +201,7 @@ void output(AVLTree<NvraRecord>* tree, metadata* metadata) //TODO: make an outpu
 			std::cout << "Enter output file name: ";
 			getline(std::cin, userInput);
 		}
-		while (treenumerator->hasNext())
-		{
-			outFile << treenumerator->next() << "\n"; //print to file
-		}
+		while (treenumerator->hasNext()) outFile << treenumerator->next() << "\n"; //print to file
 		outFile << "Data lines read: " << metadata->lineCount << "; Valid NVRA records read: " << metadata->validCount
 			<< "; NVRA records in memory: " << metadata->memoryCount << "\n";
 		outFile.close(); //done with file
@@ -265,6 +209,7 @@ void output(AVLTree<NvraRecord>* tree, metadata* metadata) //TODO: make an outpu
 	delete treenumerator;
 }
 
+//set an uninitialized array equal to this
 TemplatedArray<NvraRecord>* treeToArray(AVLTree<NvraRecord>* tree)
 {
 	TemplatedArray<NvraRecord>* array = new TemplatedArray<NvraRecord>(tree->getSize()); //initialize with proper size to prevent resizing
@@ -276,18 +221,8 @@ TemplatedArray<NvraRecord>* treeToArray(AVLTree<NvraRecord>* tree)
 	return array;
 }
 
-AVLTree<NvraRecord>* arrayToTree(TemplatedArray<NvraRecord>* array, NvraComparator* column)
-{
-	AVLTree<NvraRecord>* tree = new AVLTree<NvraRecord>(column);
-	for (unsigned long i = 0; i < array->getSize(); ++i)
-	{
-		tree->insert(new NvraRecord(array->get(i))); //add the items
-	}
-	return tree;
-}
-
 //Returns the column sorted by
-unsigned int sort(AVLTree<NvraRecord>* tree)
+unsigned int sort(TemplatedArray<NvraRecord>* array)
 {
 	std::string userInput;
 	std::cout << "Enter sort field (0-23): \n";
@@ -298,22 +233,9 @@ unsigned int sort(AVLTree<NvraRecord>* tree)
 		std::cout << "Invalid entry.\nEnter sort field (0-23): \n";
 		getline(std::cin, userInput);
 	}
-	TemplatedArray<NvraRecord>* array; //make an array
-	array = treeToArray(tree); //give the array the tree's data
 	NvraComparator* column = new NvraComparator(userNum);
 	Sorter<NvraRecord>::sort(*array, *column); //sort array
-	delete tree;
-	tree = arrayToTree(array, column); //create tree with specified comparator
 	return userNum;
-}
-
-//Prompts the user to enter the string to search for
-std::string getSearchString()
-{
-	std::string userInput;
-	std::cout << "Enter exact text on which to search: \n";
-	getline(std::cin, userInput);
-	return userInput;
 }
 
 //Prompts the user to enter the number to search for
@@ -325,33 +247,24 @@ unsigned int getSearchNumber()
 	return stoi(userInput);
 }
 
+//Prompts the user to enter the string to search for
+std::string getSearchString()
+{
+	std::string userInput;
+	std::cout << "Enter exact text on which to search: \n";
+	getline(std::cin, userInput);
+	return userInput;
+}
+
 //Returns the index used for getString or getNum
 unsigned int getSearchIndex(unsigned int column)
 {
-	if (column == 3) //string
-	{
-		return 0;
-	}
-	else if (column == 11) //string
-	{
-		return 1;
-	}
-	else if (column == 12) //string
-	{
-		return 2;
-	}
-	else if (column < 3) //num
-	{
-		return column;
-	}
-	else if (column < 11) //num
-	{
-		return column - 1;
-	}
-	else //num
-	{
-		return column - 3;
-	}
+	if (column == 3) return 0; //string
+	else if (column == 11) return 1; //string
+	else if (column == 12) return 2; //string
+	else if (column < 3) return column; //num
+	else if (column < 11) return column - 1; //num
+	else return column - 3; //num
 }
 
 //Uses linear search to find and print records
@@ -437,7 +350,7 @@ void binarySearch(TemplatedArray<NvraRecord>* array, unsigned int column)
 }
 
 //Prints records based on search field and search term
-void find(AVLTree<NvraRecord>* tree, unsigned int sortedColumn)
+void find(TemplatedArray<NvraRecord>* array, unsigned int sortedColumn)
 {
 	//TODO: if searching by id, use hash table
 	std::string userInput;
@@ -452,49 +365,53 @@ void find(AVLTree<NvraRecord>* tree, unsigned int sortedColumn)
 	}
 	if (userNum == sortedColumn) //binary search
 	{
-		//binarySearch(array, userNum);
+		binarySearch(array, userNum);
 	}
 	else //linear search
 	{
-		//linearSearch(array, userNum);
+		linearSearch(array, userNum);
 	}
 }
 
-//updates the table to be accurate with the array
-HashTable<NvraRecord>* arrayToTable(TemplatedArray<NvraRecord>* mainArray)
+//Returns a tree of the resulting merge of the trees
+AVLTree<NvraRecord>* mergeTrees(AVLTree<NvraRecord>* mainTree, AVLTree<NvraRecord>* fileTree, metadata* mainMetadata)
 {
-	Hasher<NvraRecord>* hasher = new NvraHasher();
-	Comparator<NvraRecord>* htComparator = new NvraComparator(0);
-	HashTable<NvraRecord>* newTable = new HashTable<NvraRecord>(htComparator, hasher, mainArray->getSize());
-	for (unsigned long i = 0; i < mainArray->getSize(); ++i)
+	//Following code adapted from Cameron Bost, the best TA in existence
+	NvraComparator* compareID = new NvraComparator(0);
+	AVLTree<NvraRecord>* mergeTree = new AVLTree<NvraRecord>(compareID);
+	AVLTreeEnumerator<NvraRecord>* mainEnum = new AVLTreeEnumerator<NvraRecord>(mainTree, AVLTreeOrder::inorder);
+	AVLTreeEnumerator<NvraRecord>* fileEnum = new AVLTreeEnumerator<NvraRecord>(fileTree, AVLTreeOrder::inorder);
+	mainMetadata->memoryCount = 0;
+	while (mainEnum->hasNext() && fileEnum->hasNext()) //while they both have items
 	{
-		newTable->insert(new NvraRecord(mainArray->get(i)));
-	}
-	return newTable;
-}
-
-//Merges the data from secArray into mainArray
-void mergeArrays(TemplatedArray<NvraRecord>* mainArray, TemplatedArray<NvraRecord>* secArray, TemplatedArray<unsigned int>* secIds,
-	metadata* mainMetadata)
-{
-	Comparator<NvraRecord>* idCompare = new NvraComparator(0);
-	NvraRecord searchRecord;
-	int replaceIndex;
-	for (unsigned long i = 0; i < secIds->getSize(); ++i)
-	{
-		searchRecord = secArray->get(i); //get a record from the array
-		replaceIndex = (int)binarySearch(searchRecord, *mainArray, *idCompare); //see if its id exists in the mainArray
-		if (replaceIndex >= 0) //record found with matching id in mainArray
+		if (compareID->compare(mainEnum->peek() , fileEnum->peek()) == 0) //if the two match
 		{
-			mainArray->replaceAt(new NvraRecord(searchRecord), (unsigned long)replaceIndex); //replace matching record
-			//memoryCount starts out assuming that all records will be added, so if one is replaced then memoryCount should decrement
-			--mainMetadata->memoryCount;
+			mergeTree->insert(new NvraRecord(fileEnum->next())); //take the file's item
+			mainEnum->next(); //skip the main's item
+			++mainMetadata->memoryCount;
 		}
-		else //record isn't in mainArray
+		else if (compareID->compare(mainEnum->peek(), fileEnum->peek()) == -1) //if main is less than file
 		{
-			mainArray->add(new NvraRecord(searchRecord)); //add it
+			mergeTree->insert(new NvraRecord(mainEnum->next())); //take the main's item
+			++mainMetadata->memoryCount;
+		}
+		else if (compareID->compare(mainEnum->peek(), fileEnum->peek()) == 1) //if file is less than main
+		{
+			mergeTree->insert(new NvraRecord(fileEnum->next())); //take the file's item
+			++mainMetadata->memoryCount;
 		}
 	}
+	while (mainEnum->hasNext())
+	{
+		mergeTree->insert(new NvraRecord(mainEnum->next()));
+		++mainMetadata->memoryCount;
+	}
+	while (fileEnum->hasNext())
+	{
+		mergeTree->insert(new NvraRecord(fileEnum->next()));
+		++mainMetadata->memoryCount;
+	}
+	return mergeTree;
 }
 
 //Gets a file from the user, reads the data, merges the data with the main data
@@ -503,143 +420,93 @@ bool merge(AVLTree<NvraRecord>* mainTree, metadata* metadata)
 	std::ifstream* myFile = new std::ifstream;
 	NvraComparator* compareID = new NvraComparator(0);
 	AVLTree<NvraRecord>* fileTree = new AVLTree<NvraRecord>(compareID); //holds data to be merged
-	TemplatedArray<unsigned int>* ids = new TemplatedArray<unsigned int>; //holds ids
-	checkMemory(ids);
-	if (!openFile(myFile)) //if the user just presses enter
-	{
-		return false;
-	}
-	readFile(myFile, fileTree, metadata, ids);
-	//mergeArrays(mainArray, array, ids, metadata);
-	//if (mainArray->getSize() > 0)
-	//{
-	//	NvraComparator* column = new NvraComparator(0);
-	//	Sorter<NvraRecord>::sort(*mainArray, *column); //sort by id
-	//}
+	if (!openFile(myFile)) return false; //if the user just presses enter
+	readFile(myFile, fileTree, metadata); //read into the fileTree
+	mainTree = mergeTrees(mainTree, fileTree, metadata); //merge the trees
 	delete myFile;
+	delete fileTree;
 	return true;
 }
 
-//Purges the data in mainArray that matches data in secArray
-void purgeArrays(TemplatedArray<NvraRecord>* mainArray, TemplatedArray<NvraRecord>* secArray, TemplatedArray<unsigned int>* secIds,
-	metadata* mainMetadata)
+void traverseTree(std::string userInput, AVLTree<NvraRecord>* mainTree, metadata* metadata)
 {
-	Comparator<NvraRecord>* idCompare = new NvraComparator(0);
-	NvraRecord searchRecord;
-	int replaceIndex;
-	for (unsigned long i = 0; i < secIds->getSize(); ++i)
-	{
-		searchRecord = secArray->get(i); //get a record from the array
-		replaceIndex = (int)binarySearch(searchRecord, *mainArray, *idCompare); //see if its id exists in the mainArray
-		if (replaceIndex >= 0) //record found with matching id in mainArray
-		{
-			mainArray->removeAt((unsigned long)replaceIndex); //remove the matching record
-			--mainMetadata->memoryCount;
-		}
-	}
-}
-
-//Gets a file from the user, reads the data, purges any records from mainArray that match those in the user's file
-bool purge(TemplatedArray<NvraRecord>* mainArray, metadata* metadata)
-{
-	std::ifstream* myFile = new std::ifstream;
-	unsigned long startingMemoryCount = metadata->memoryCount;
-	TemplatedArray<NvraRecord>* array = new TemplatedArray<NvraRecord>; //holds data to be merged
-	checkMemory(array);
-	TemplatedArray<unsigned int>* ids = new TemplatedArray<unsigned int>; //holds ids
-	checkMemory(ids);
-	if (!openFile(myFile)) //if the user just presses enter
-	{
-		return false;
-	}
-	//readFile(myFile, array, metadata, ids);
-	//readFile assumes that the data will be stored so memoryCount must be restored to before the file was read in
-	metadata->memoryCount = startingMemoryCount;
-	purgeArrays(mainArray, array, ids, metadata);
-	if (mainArray->getSize() > 0)
-	{
-		NvraComparator* column = new NvraComparator(0);
-		Sorter<NvraRecord>::sort(*mainArray, *column); //sort by id
-	}
-	delete myFile;
-	return true;
-}
-
-//Prints the records line by line and data about the hash table
-void printHashTable(HashTable<NvraRecord>* table, metadata* metadata)
-{
-	std::string userInput;
+	AVLTreeOrder order;
+	if (userInput == "in") order = AVLTreeOrder::inorder;
+	else if (userInput == "pre") order = AVLTreeOrder::preorder;
+	else if (userInput == "post") order = AVLTreeOrder::postorder;
+	else std::cout << "\nfailure in traverseTree\n";
+	AVLTreeEnumerator<NvraRecord>* treenumerator = new AVLTreeEnumerator<NvraRecord>(mainTree, order);
 	std::cout << "Enter output file name: ";
 	getline(std::cin, userInput);
 	if (userInput == "") //user presses enter, print to standard out
 	{
-		table->printTable();
+		while (treenumerator->hasNext()) std::cout << treenumerator->next() << "\n"; //print to console
 		std::cout << "Data lines read: " << metadata->lineCount << "; Valid NVRA records read: " << metadata->validCount
 			<< "; NVRA records in memory: " << metadata->memoryCount << "\n";
 	}
-	else
+	else //user inputs a string
 	{
-		std::ofstream* outFile = new std::ofstream;
-		outFile->open(userInput);
-		while (!outFile->is_open())
+		std::ofstream outFile;
+		outFile.open(userInput);
+		while (!outFile.is_open())
 		{
 			std::cout << "File is not available." << std::endl; //display error
 			std::cout << "Enter output file name: ";
 			getline(std::cin, userInput);
 		}
-		table->printTable(outFile);
-		*outFile << "Data lines read: " << metadata->lineCount << "; Valid NVRA records read: " << metadata->validCount
+		while (treenumerator->hasNext()) outFile << treenumerator->next() << "\n"; //print to file
+		outFile << "Data lines read: " << metadata->lineCount << "; Valid NVRA records read: " << metadata->validCount
 			<< "; NVRA records in memory: " << metadata->memoryCount << "\n";
-		outFile->close(); //done with file
-		delete outFile;
+		outFile.close(); //done with file
 	}
+	delete treenumerator;
 }
 
 //Prompt the user for what action they want
 std::string mutatorLoopPrompt()
 {
 	std::string userInput;
-	std::cout << "Enter (o)utput, (s)ort, (f)ind, (m)erge, (p)urge, (h)ash table, " 
+	std::cout << "Enter (o)utput, (s)ort, (f)ind, (m)erge, (p)urge, (h)ash table, "
 		<< "(pre)order, (in)order, (post)order, or (q)uit: ";
 	getline(std::cin, userInput);
 	return userInput;
 }
 
-int main()
+int mutatorLoop(std::string userInput, AVLTree<NvraRecord>* mainTree, metadata* mainMetadata,
+	TemplatedArray<NvraRecord>* mainArray, unsigned int sortedColumn)
 {
-	NvraComparator* compareID = new NvraComparator(0);
-	AVLTree<NvraRecord>* tree = new AVLTree<NvraRecord>(compareID);
-	metadata* mainMetadata = new metadata; //contains the metadata of running the program
-	//TemplatedArray<NvraRecord>* mainArray = new TemplatedArray<NvraRecord>; //holds all the lines
-	TemplatedArray<unsigned int>* mainIds = new TemplatedArray<unsigned int>; //holds ids
-	checkMemory(mainIds);
-	Hasher<NvraRecord>* hasher = new NvraHasher(); //used for hash function
-	checkMemory(hasher);
-	Comparator<NvraRecord>* htComparator = new NvraComparator(0); //used in constructing hash tables
-	checkMemory(htComparator);
-	//HashTable<NvraRecord>* hTable; //contains every record, used for fast searching by id
-	std::string userInput; //contains what the user types into the console
-	unsigned int sortedColumn = 0; //the column the data is sorted on, id is default
-	if (getUserFile(tree, mainMetadata) == 1) return 0; //get the initial file, if the user just presses enter then close voteR
-	//hTable = new HashTable<NvraRecord>(htComparator, hasher, mainArray->getSize()); //initialize table
-	//hTable = arrayToTable(mainArray); //update the table
 	userInput = mutatorLoopPrompt(); //priming read
 	while (userInput != "q")
 	{
-		if (userInput == "o") output(tree, mainMetadata); //output
-		else if (userInput == "s") sortedColumn = sort(tree); //sort
-		else if (userInput == "f") find(tree, sortedColumn); //find
-		else if (userInput == "m") //merge
+		if (userInput == "o")
 		{
-			merge(tree, mainMetadata);
-			//hTable = arrayToTable(mainArray);
+			output(mainTree, mainMetadata);
 		}
-		else if (userInput == "p") //purge
+		else if (userInput == "s")
 		{
-			//purge(tree, mainMetadata);
-			//hTable = arrayToTable(mainArray);
+			sortedColumn = sort(mainArray);
 		}
-		//else if (userInput == "h") printHashTable(hTable, mainMetadata); //hash table
+		else if (userInput == "f")
+		{
+			find(mainArray, sortedColumn);
+		}
+		else if (userInput == "m")
+		{
+			merge(mainTree, mainMetadata);
+			mainArray = treeToArray(mainTree);
+		}
+		else if (userInput == "p")
+		{
+			std::cout << "\nnope\n";
+		}
+		else if (userInput == "h")
+		{
+			std::cout << "\nnope\n";
+		}
+		else if (userInput == "pre" || userInput == "in" || userInput == "post")
+		{
+			traverseTree(userInput, mainTree, mainMetadata);
+		}
 		else
 		{
 			std::cout << "Your input did not match any option.\n";
@@ -648,4 +515,23 @@ int main()
 	}
 	std::cout << "Thanks for using VoteR.\n";
 	return 0;
+}
+
+int main()
+{
+	metadata* mainMetadata = new metadata; //contains the metadata from running the program
+	checkMemory(mainMetadata);
+	NvraComparator* compareID = new NvraComparator(0);
+	checkMemory(compareID);
+	AVLTree<NvraRecord>* mainTree = new AVLTree<NvraRecord>(compareID);
+	checkMemory(mainTree);
+	TemplatedArray<NvraRecord>* mainArray = new TemplatedArray<NvraRecord>;
+	checkMemory(mainArray);
+	unsigned int sortedColumn = 0; //the column the data is sorted on in mainArray, id is default
+	std::string userInput; //contains what the user types into the console
+
+	if (getInitialFile(mainTree, mainMetadata) == 1) return 0; //get the initial file, if the user just presses enter then close voteR
+	mainArray = treeToArray(mainTree); //update mainArray
+
+	return mutatorLoop(userInput, mainTree, mainMetadata, mainArray, sortedColumn);
 }

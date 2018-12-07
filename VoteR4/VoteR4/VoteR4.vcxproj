@@ -155,7 +155,6 @@
     <ClCompile Include="NvraComparator.cpp" />
     <ClCompile Include="NvraHasher.cpp" />
     <ClCompile Include="NvraRecord.cpp" />
-    <ClCompile Include="VoteR4-2.cpp" />
     <ClCompile Include="VoteR4.cpp" />
   </ItemGroup>
   <ItemGroup>

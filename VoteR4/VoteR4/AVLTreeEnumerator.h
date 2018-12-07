@@ -45,7 +45,11 @@ AVLTreeEnumerator<T>::~AVLTreeEnumerator()
 template <typename T>
 bool AVLTreeEnumerator<T>::hasNext() const
 {
-	if (traversalStack.top() != NULL || traversalStack.top()->data != NULL)
+	if (traversalStack.empty())
+	{
+		return false;
+	}
+	if (traversalStack.top() != NULL && traversalStack.top()->data != NULL)
 	{
 		return true;
 	}
