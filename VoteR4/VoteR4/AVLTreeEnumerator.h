@@ -81,7 +81,6 @@ template <typename T>
 void AVLTreeEnumerator<T>::buildTraversalStack(const AVLTree<T>* current)
 {
 	if (current == NULL) throw new ExceptionAVLTreeAccess();
-	traversalStack.emplace(current);
 	if (order == AVLTreeOrder::inorder)
 	{
 		inOrderPush(current);

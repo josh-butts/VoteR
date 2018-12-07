@@ -1,5 +1,5 @@
 /*
-VoteR4-2
+VoteR4-2 Driver
 */
 
 #include "Exceptions.h"
@@ -11,6 +11,13 @@ VoteR4-2
 #include "AVLTree.h"
 #include "AVLTreeEnumerator.h"
 #include "AVLTreeOrder.h"
+#include "OULink.h"
+#include "OULinkedList.h"
+#include "OULinkedListEnumerator.h"
+#include "Hasher.h"
+#include "HashTable.h"
+#include "HashTableEnumerator.h"
+#include "NvraHasher.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -376,7 +383,7 @@ void find(TemplatedArray<NvraRecord>* array, unsigned int sortedColumn)
 //Returns a tree of the resulting merge of the trees
 AVLTree<NvraRecord>* mergeTrees(AVLTree<NvraRecord>* mainTree, AVLTree<NvraRecord>* fileTree, metadata* mainMetadata)
 {
-	//Following code adapted from Cameron Bost, the best TA in existence
+	//Following code adapted from Cameron Bost
 	NvraComparator* compareID = new NvraComparator(0);
 	AVLTree<NvraRecord>* mergeTree = new AVLTree<NvraRecord>(compareID);
 	AVLTreeEnumerator<NvraRecord>* mainEnum = new AVLTreeEnumerator<NvraRecord>(mainTree, AVLTreeOrder::inorder);
@@ -384,50 +391,47 @@ AVLTree<NvraRecord>* mergeTrees(AVLTree<NvraRecord>* mainTree, AVLTree<NvraRecor
 	mainMetadata->memoryCount = 0;
 	while (mainEnum->hasNext() && fileEnum->hasNext()) //while they both have items
 	{
-		if (compareID->compare(mainEnum->peek() , fileEnum->peek()) == 0) //if the two match
+		if (mainEnum->peek().getNum(0) == fileEnum->peek().getNum(0)) //if the two ids match
 		{
 			mergeTree->insert(new NvraRecord(fileEnum->next())); //take the file's item
 			mainEnum->next(); //skip the main's item
-			++mainMetadata->memoryCount;
 		}
-		else if (compareID->compare(mainEnum->peek(), fileEnum->peek()) == -1) //if main is less than file
+		else if (mainEnum->peek().getNum(0) < fileEnum->peek().getNum(0)) //if main is less than file
 		{
 			mergeTree->insert(new NvraRecord(mainEnum->next())); //take the main's item
-			++mainMetadata->memoryCount;
 		}
-		else if (compareID->compare(mainEnum->peek(), fileEnum->peek()) == 1) //if file is less than main
+		else if (mainEnum->peek().getNum(0) > fileEnum->peek().getNum(0)) //if main is greater than file
 		{
 			mergeTree->insert(new NvraRecord(fileEnum->next())); //take the file's item
-			++mainMetadata->memoryCount;
 		}
 	}
 	while (mainEnum->hasNext())
 	{
 		mergeTree->insert(new NvraRecord(mainEnum->next()));
-		++mainMetadata->memoryCount;
 	}
 	while (fileEnum->hasNext())
 	{
 		mergeTree->insert(new NvraRecord(fileEnum->next()));
-		++mainMetadata->memoryCount;
 	}
+	mainMetadata->memoryCount = mergeTree->getSize();
 	return mergeTree;
 }
 
 //Gets a file from the user, reads the data, merges the data with the main data
-bool merge(AVLTree<NvraRecord>* mainTree, metadata* metadata)
+AVLTree<NvraRecord>* merge(AVLTree<NvraRecord>* mainTree, metadata* metadata)
 {
 	std::ifstream* myFile = new std::ifstream;
 	NvraComparator* compareID = new NvraComparator(0);
 	AVLTree<NvraRecord>* fileTree = new AVLTree<NvraRecord>(compareID); //holds data to be merged
-	if (!openFile(myFile)) return false; //if the user just presses enter
+	if (!openFile(myFile)) return mainTree; //if the user just presses enter
 	readFile(myFile, fileTree, metadata); //read into the fileTree
 	mainTree = mergeTrees(mainTree, fileTree, metadata); //merge the trees
 	delete myFile;
 	delete fileTree;
-	return true;
+	return mainTree;
 }
 
+//Prints the tree in the specified order
 void traverseTree(std::string userInput, AVLTree<NvraRecord>* mainTree, metadata* metadata)
 {
 	AVLTreeOrder order;
@@ -492,7 +496,7 @@ int mutatorLoop(std::string userInput, AVLTree<NvraRecord>* mainTree, metadata* 
 		}
 		else if (userInput == "m")
 		{
-			merge(mainTree, mainMetadata);
+			mainTree = merge(mainTree, mainMetadata);
 			mainArray = treeToArray(mainTree);
 		}
 		else if (userInput == "p")

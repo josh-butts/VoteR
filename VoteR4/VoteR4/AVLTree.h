@@ -135,12 +135,12 @@ bool AVLTree<T>::replace(const T* item)
 	else if (comparator->compare(T(*data), T(*item)) == -1) //subtree belongs to the right
 	{
 		if (right == NULL) return false; //no right subtree
-		right->replace(item); //look on right
+		return right->replace(item); //look on right
 	}
 	else if (comparator->compare(T(*data), T(*item)) == 1) //subtree belongs to the left
 	{
 		if (left == NULL) return false; //no left subtree
-		left->replace(item); //look on the left
+		return left->replace(item); //look on the left
 	}
 	else if (comparator->compare(T(*data), T(*item)) == 0) //item matches subtree data
 	{
@@ -165,12 +165,12 @@ T AVLTree<T>::find(const T* item) const
 	else if (comparator->compare(T(*data), T(*item)) == -1) //subtree belongs to the right
 	{
 		if (right == NULL) throw new ExceptionAVLTreeAccess(); //no right subtree
-		right->find(item); //look on the right
+		return right->find(item); //look on the right
 	}
 	else if (comparator->compare(T(*data), T(*item)) == 1) //subtree belongs to the left
 	{
 		if (left == NULL) throw new ExceptionAVLTreeAccess(); //no left subtree
-		left->find(item); //look on the left
+		return left->find(item); //look on the left
 	}
 	else
 	{
