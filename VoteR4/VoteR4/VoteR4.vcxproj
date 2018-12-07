@@ -155,6 +155,7 @@
     <ClCompile Include="NvraComparator.cpp" />
     <ClCompile Include="NvraHasher.cpp" />
     <ClCompile Include="NvraRecord.cpp" />
+    <ClCompile Include="VoteR4-2.cpp" />
     <ClCompile Include="VoteR4.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +182,7 @@
     <None Include="partial1.csv" />
     <None Include="partial4.csv" />
     <None Include="partial4_duplicates.csv" />
+    <None Include="x.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

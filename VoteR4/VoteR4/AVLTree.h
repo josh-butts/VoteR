@@ -75,8 +75,8 @@ bool AVLTree<T>::insert(const T* item) //The following code is adapted from Came
 		if (right == NULL) //if there is no right subtree
 		{
 			right = new AVLTree<T>(comparator); //initialize it
-			right->insert(item);
-			++size;
+			success = right->insert(item);
+			//++size;
 			++diff;
 		}
 		else 
@@ -101,8 +101,8 @@ bool AVLTree<T>::insert(const T* item) //The following code is adapted from Came
 		if (left == NULL) //there is no left
 		{
 			left = new AVLTree<T>(comparator); //initialize it
-			left->insert(item);
-			++size;
+			success = left->insert(item);
+			//++size;
 			--diff;
 		}
 		else
@@ -269,15 +269,27 @@ void AVLTree<T>::zagLeftZigRight()
 template <typename T>
 void AVLTree<T>::rebalance()
 {
-	//4 cases: zig, zag, zigzag, zagzig
-	//called on root
-	//if dif = 2, check right subtree
-	//if right subtree diff is 1 or zero, zigRight()
-	//if right subtree diff is -1, 
 	if (diff == 2)
 	{
-		if (this->right->diff > -1)
+		if (this->right->diff == 1)
 		{
+			zagLeft();
+		}
+		if (this->right->diff == -1)
+		{
+			this->right->zigRight();
+			zagLeft();
+		}
+	}
+	if (diff == -2)
+	{
+		if (this->left->diff == -1)
+		{
+			zigRight();
+		}
+		if (this->left->diff == -1)
+		{
+			this->left->zagLeft();
 			zigRight();
 		}
 	}

@@ -30,8 +30,8 @@ template <typename T>
 AVLTreeEnumerator<T>::AVLTreeEnumerator(const AVLTree<T>* root, AVLTreeOrder order)
 {
 	if (root == NULL || root->data == NULL) throw new ExceptionAVLTreeAccess();
-	if (order != AVLTreeOrder::inorder || order != AVLTreeOrder::postorder
-		|| order != AVLTreeOrder::preorder) throw new ExceptionAVLTreeAccess();
+	if (order != AVLTreeOrder::inorder && order != AVLTreeOrder::postorder
+		&& order != AVLTreeOrder::preorder) throw new ExceptionAVLTreeAccess();
 	this->order = order;
 	buildTraversalStack(root);
 }
@@ -45,7 +45,7 @@ AVLTreeEnumerator<T>::~AVLTreeEnumerator()
 template <typename T>
 bool AVLTreeEnumerator<T>::hasNext() const
 {
-	if (traversalStack.top()->data != NULL)
+	if (traversalStack.top() != NULL || traversalStack.top()->data != NULL)
 	{
 		return true;
 	}
